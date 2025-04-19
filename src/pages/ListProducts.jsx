@@ -1,41 +1,58 @@
-import React from 'react'
-import ProductCard from '../components/ProductCard'
-import { useNavigate  } from "react-router-dom";
-
-
+import { useEffect, useState } from 'react'
+import ProductCard from '../components/ProductCard';
+import SideBar from '../components/SideBar';
+import Search from '../components/Search';
+import StatusView from '../components/StatusView';
 
 const ListProducts = () => {
-    const navigate = useNavigate();
-    const products = [
-        {name: "Cinnamon Dolce Latte",
-            price: 20000,
-            img: "/assets/CinnamonDolceLatte.jpg"
-        },
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-        {name: "Caffe Mocha",
-            price: 15000,
-            img: "/assets/CaffeMocha.jpg"
-        },
-        {name: "White Chocolate Mocha",
-            price: 30000,
-            img: "/assets/WhiteChocolateMocha.jpg"
+
+    const fetchProducts = async () => {
+        try {
+            const response = await fetch('http://localhost:5001/api/products');
+            const data = await response.json();
+            setProducts(data)
+            setLoading(false);
+        } catch (error) {
+            setError(error)
+            console.error('Error al obtener los productos', error);
+            setLoading(false);
         }
+    }
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const data = [
+        { "categoria": "Bebidas", "subcategorias": ["Cafe caliente", "Cafe frio"] },
+        { "categoria": "Comida", "subcategorias": ["Dulce", "Salado"] }
     ]
 
-    
-  return (
-    <section>
-        <ul className='flex gap-5 flex-wrap'>
-            {products.map((product)=>( 
-                <li key={product.id} onClick={()=> navigate(`/products/${product.id}`)} className='cursor-pointer'>
-                    <ProductCard
-                    product={product}
-                    />
-                </li>
-            ))}
-        </ul>
-    </section>
-  )
+    return (
+        < >
+            <StatusView loading={loading} error={error} empty={products.length === 0} />
+            {!loading && !error && (
+                <main className='flex'>
+                    <SideBar data={data} />
+                    <div className='p-3 flex flex-col w-full'>
+                        <Search className="flex justify-end mb-2" />
+                        <ul className='flex gap-5 flex-wrap'>
+                            {products.map((product) => (
+                                <li key={product._id} className='cursor-pointer'>
+                                    <ProductCard
+                                        product={product}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </main>
+            )}
+        </>
+    )
 }
 
 export default ListProducts
