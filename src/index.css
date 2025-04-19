@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@keyframes steamUp {
+    0% {
+      stroke-dashoffset: 100;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    50% {
+      opacity: 1;
+      stroke-dashoffset: 50;
+      transform: translateY(0);
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  .animate-steam {
+    stroke-dasharray: 25;
+    animation: steamUp 2.4s ease-in-out infinite;
+    transform-box: fill-box;  
+    transform-origin: center;
+    
+  }
+  

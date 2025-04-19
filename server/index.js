@@ -1,35 +1,68 @@
-const express = require('express');
+import express from 'express';
+import connectDB from './config/db.js';
+import multer from 'multer';
+import Product from './models/Product.js';
+import dotenv from 'dotenv';
+import cors from 'cors';
+
+dotenv.config();
 
 const app = express()
 
-const posts = [
-    {id: 1, content: 'me gustan los gatos'},
-     {id: 2, content: 'me gustan los perros'},
-     {id: 3, content: 'me gustan lo loros'},
-];
+app.use(cors({
+  origin: 'http://localhost:5173',  // Asegúrate de que este sea el puerto de tu frontend
+}));
+app.use('/uploads', express.static('../public/uploads'));
 
-/* const app = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end(JSON.stringify(posts));
-}); */
+connectDB();
 
-app.get('/', (req, res)=>{
-res.send('<h1>Hola</h1>')
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, '../public/uploads/')
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  }
 })
 
-app.get('/api/notes',( req, res)=>{
-  res.json(posts)
+const upload = multer({ storage: storage })
+
+app.post('/api/products', upload.single('image'), async (req, res) => {
+  try {
+    const { name, description, stock, type, category } = req.body;
+    const image = req.file ? req.file.filename : null;
+    const product = new Product({ name, description, stock, type, category, image });
+    await product.save();
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al crear el producto', error });
+  }
 })
 
-app.get('/api/notes/:id',(req, res)=>{
-  const id = Number(req.params.id)
-  console.log({id})
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.status(200).json(products);
 
-  const post = posts.find(post => post.id === id)
-  console.log("hola",{post})
-  res.json(post)
+  } catch (error){
+    res.status(500).json({ message: 'Error al obtener los productos', error });
+  }
 })
 
-const PORT = 3001;
+app.get('/api/products/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const products = await Product.findById(id);
+    res.status(200).json(products);
+
+  } catch(error) {
+    res.status(500).json({ message: 'Error al obtener los productos', error });
+  }
+})
+
+
+
+const PORT = process.env.PORT || 3001;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);

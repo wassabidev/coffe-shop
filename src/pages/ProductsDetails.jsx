@@ -1,18 +1,25 @@
-import React from 'react'
+import { useState, useEffect } from 'react'
+import ProductDetails from '../components/ProductDetails'
+import { useParams } from 'react-router-dom'
 
-const ProductsDetails = ({products, id}) => {
+const ProductsDetails = () => {
+  const { id } = useParams()
+  const [product, setProduct] = useState(null)
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/api/products/${id}`)
+        const data = await response.json()
+        setProduct(data)
+      } catch (error) {
+        console.error('Error fetching product:', error)
+      }
+    }
+    fetchProduct()
+  }, [id])
+  if (!product) return <div>Loading...</div>
   return (
-    <div className='flex flex-col items-center justify-center gap-5'>
-        <h1 className='text-2xl font-bold'>Caffe Mocha</h1>
-
-        <p className='rounded-md p-2 bg-green-100 text-green-400'>Salado</p>
-        <p className='text-lg'>15000 G</p>
-        <label htmlFor="cantidad">Cantidad</label>
-        <input type="number" id='cantidad'/>
-        <p className='text-lg'>Description: A delicious blend of espresso, steamed milk, and chocolate syrup, topped with whipped cream.</p>
-        <button className='bg-blue-500 text-white py-2 px-4 rounded-md'>Add to Cart</button>
-      <img src="/assets/CaffeMocha.jpg" alt="" className='w-1/2 rounded-md'/>
-    </div>
+    <ProductDetails product={product} />
   )
 }
 
