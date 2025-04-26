@@ -18,6 +18,8 @@
     "@tanstack/react-router": "^1.116.0",
     "@tanstack/react-table": "^8.21.3",
     "antd": "^5.24.7",
+    "antd-style": "^3.7.1",
+    "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -38,9 +40,12 @@
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.2.6",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "prettier": "^3.5.3",
     "react-router-dom": "^7.4.1",
     "vite": "^6.2.0"
   }
