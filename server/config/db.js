@@ -1,10 +1,11 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import dotenv from "dotenv";
+import mongoose from "mongoose";
 
-import mongoose from 'mongoose';
+dotenv.config();
+mongoose.set("strictQuery", true);
 
 const connectDB = async () => {
-  console.log('MONGO_URI:', process.env.MONGO_URI);
+  console.log("MONGO_URI:", process.env.MONGO_URI);
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
 

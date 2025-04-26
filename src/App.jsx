@@ -1,19 +1,24 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
-import ListProducts from './pages/ListProducts'
-import Cart from './pages/CartDetail'
-import ProductsDetails from './pages/ProductsDetails'
-import AdminLayout from './pages/AdminLayout'
-import AdminProducts from './admin/pages/Products'
-import AdminCategories from './admin/pages/Categories'
-import Favorite from './pages/Favorites'
-import NoFound from './pages/NotFound'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
+
+import AdminLayout from "./pages/AdminLayout";
+import AdminProducts from "./admin/pages/Products";
+import AdminCategories from "./admin/pages/Categories";
+
+import NoFound from "./pages/NotFound";
+
+import LoginPage from "./pages/LoginPage";
+import Cart from "./pages/CartDetail";
+import ListProducts from "./pages/ListProducts";
+import ProductsDetails from "./pages/ProductsDetails";
+import Favorite from "./pages/Favorites";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path='*' element={<NoFound />} />
+        <Route path="*" element={<NoFound />} />
+        <Route path="/login" element={<LoginPage />} />
 
         {/* Cliente */}
         <Route element={<Layout />}>
@@ -31,7 +36,7 @@ function App() {
         </Route>
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;
