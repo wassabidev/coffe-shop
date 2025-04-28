@@ -1,16 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../provider/authProvider";
 
 const LoginPage = () => {
-  const { setToken } = useAuth();
+  const { setToken, setUser } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
 
     try {
       const response = await axios.post("http://localhost:5001/api/login", {
@@ -18,12 +20,19 @@ const LoginPage = () => {
         password,
       });
       const token = response.data.token;
+      const user = response.data.user;
       setToken(token);
+      setUser(user);
       navigate("/");
     } catch (error) {
-      console.error("error al iniciar session", error);
+      console.error(
+        "error al iniciar sesión",
+        error.response?.data?.mensaje || error.message,
+      );
+      setError(error.response?.data?.mensaje || "Error desconocido");
     }
   };
+
   return (
     <div className="flex h-dvh gap-3 w-full">
       <div className="bg-[#FFC671] bg-opacity-50 hidden md:flex items-center justify-center w-1/2">
@@ -46,6 +55,7 @@ const LoginPage = () => {
               <label htmlFor="email">Correo</label>
               <input
                 type="text"
+                onChange={(e) => setEmail(e.target.value)}
                 className="!mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5"
               />
             </div>
@@ -54,15 +64,27 @@ const LoginPage = () => {
               <label htmlFor="password">Contraseña</label>
               <input
                 type="password"
-                className="!mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5"
+                onChange={(e) => setPassword(e.target.value)}
+                className={`${
+                  error
+                    ? "bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
+                    : ""
+                } 
+                   !mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5`}
               />
+              {error && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
+                  <span className="font-medium">Oh, snapp!</span>
+                  Some error message.
+                </p>
+              )}
             </div>
             <div className="py-4 flex justify-end">
               <Link className="text-blue-400 underline">
                 Olvide mi contraseña
               </Link>
             </div>
-            <button className="block p-3 rounded-lg bg-gray-800 !text-gray-100">
+            <button className="block p-3 rounded-lg bg-gray-800 !text-gray-100 cursor-pointer">
               Ingresar
             </button>
           </form>

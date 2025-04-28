@@ -14,8 +14,8 @@ const ProductSchema = new mongoose.Schema({
     required: true,
   },
   category: {
-    type: String,
-    enum: ["comida", "bebida"],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
     required: true,
   },
   type: {

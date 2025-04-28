@@ -42,7 +42,7 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ error: "Authentication failed" });
+      return res.status(401).json({ mensaje: "Usuario no encontrado" });
     }
     const match = await bcrypt.compare(password, user.password);
     if (!match)
@@ -56,9 +56,12 @@ export const login = async (req, res) => {
       },
     );
 
-    res.json({ token, name: user.name });
+    res.json({
+      token,
+      user: { name: user.name, email: user.email, role: user.role },
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Login failed", error: error.menssage });
+    res.status(500).json({ message: "Login failed", error: error.message });
   }
 };

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useAuth } from "../provider/authProvider";
 import { FolderOutlined } from "@ant-design/icons";
 
 const SideBar = ({ data }) => {
   const [selected, setSelected] = useState(null);
+  const { user } = useAuth();
 
   const handleSubcategoriaClick = (sub) => {
     setSelected(sub);
