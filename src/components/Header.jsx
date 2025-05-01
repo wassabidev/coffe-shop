@@ -1,13 +1,18 @@
 import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
-import { useAuth } from "../provider/authProvider";
+import { logout } from "../features/users/userSlice";
+import { useDispatch } from "react-redux";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const cartItems = useSelector((store) => store.cart.items);
   const navigate = useNavigate();
-  const { setToken, setUser } = useAuth();
+  const { user: userData, isAuthenticated } = useSelector(
+    (state) => state.user,
+  );
+  const dispatch = useDispatch();
 
   const navItems = [
     { label: "Prodouctos", path: "/" },
@@ -16,21 +21,84 @@ const Header = () => {
     { label: "Contactos", path: "/contacts" },
   ];
 
+  const Avatar = () => {
+    return (
+      <div
+        className={`${isAuthenticated && "p-4"} flex justify-center items-center w-10 h-10 bg-slate-200 rounded-full`}
+      >
+        {isAuthenticated && userData ? (
+          <p className="!m-0 !text-xl font-semmibold">
+            {userData.name.charAt(0)}
+          </p>
+        ) : (
+          <img src="/assets/user.svg" alt="" />
+        )}
+      </div>
+    );
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    setIsOpen(false);
+  };
+
   return (
     <header className="bg-gray-100 border-b-[0.1rem] border-gray-400 p-2">
-      <div
-        onClick={() => setIsOpen(false)}
-        className="z-10 absolute top-0 left-0  h-dvh w-dvw"
-      ></div>
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="z-10 absolute top-0 left-0  h-dvh w-dvw"
+        ></div>
+      )}
 
       <ul className="flex items-center justify-between !m-0">
-        <div>
-          <li>
-            <a href="/">
-              <img src="/assets/logocat.svg" alt="" />
-            </a>
-          </li>
-        </div>
+        <section className="flex md:hidden">
+          <div
+            className="space-y-2 cursor-pointer"
+            onClick={() => setIsNavOpen((prev) => !prev)}
+          >
+            <span className="block h-0.5 w-8 bg-gray-600"></span>
+            <span className="block h-0.5 w-8 bg-gray-600"></span>
+            <span className="block h-0.5 w-8 bg-gray-600"></span>
+          </div>
+
+          <div
+            className={
+              isNavOpen
+                ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-10 "
+                : "hidden"
+            }
+          >
+            <div
+              className="absolute top-0 right-0 px-8 py-8"
+              onClick={() => setIsNavOpen(false)}
+            >
+              <svg
+                className="h-8 w-8 text-gray-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </div>
+            <ul className="flex flex-col items-center justify-between min-h-[250px]">
+              <li className="border-b border-gray-400 my-8 uppercase">
+                <a href="/about">About</a>
+              </li>
+              <li className="border-b border-gray-400 my-8 uppercase">
+                <a href="/portfolio">Portfolio</a>
+              </li>
+              <li className="border-b border-gray-400 my-8 uppercase">
+                <a href="/contact">Contact</a>
+              </li>
+            </ul>
+          </div>
+        </section>
         <div className="hidden md:flex gap-3">
           {navItems.map(({ label, path, icon }) => (
             <NavLink
@@ -55,38 +123,47 @@ const Header = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="relative z-10 rounded-full cursor-pointer bg-gray-300 border-[0.1rem] border-gray-400 p-2"
+              className="relative z-10 cursor-pointer"
             >
-              <img src="/assets/user.svg" alt="" />
+              <Avatar />
             </button>
           </li>
 
-          <div
-            className={`${!isOpen ? "hidden" : ""} absolute right-0 top-10 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-hidden`}
-          >
-            <div className="py-1" aria-labelledby="dropdownDefaultButton">
-              <a
-                href="#"
-                className="block px-4 py-2 text-sm text-gray-700"
-                role="menuitem"
-              >
-                Account settings
-              </a>
+          {isOpen && (
+            <div
+              className={` absolute right-0 top-10 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-hidden`}
+            >
+              <div className="py-1" aria-labelledby="dropdownDefaultButton">
+                {userData && (
+                  <>
+                    <div>
+                      {userData.name}
+                      {userData.email}
+                    </div>
+                    <a
+                      href="#"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
+                      role="menuitem"
+                    >
+                      Account settings
+                    </a>
+                  </>
+                )}
 
-              <form method="POST" action="#" role="none">
-                <button
-                  type="submit"
-                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 cursor-pointer"
-                  onClick={() => {
-                    setToken("");
-                    setUser("");
-                  }}
-                >
-                  Sign out
-                </button>
-              </form>
+                <form method="POST" action="#" role="none">
+                  <button
+                    type="submit"
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 cursor-pointer hover:bg-slate-100"
+                    onClick={
+                      isAuthenticated ? handleLogout : navigate("/login")
+                    }
+                  >
+                    {isAuthenticated ? "Sign out" : "Sign in"}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
+          )}
           <li>
             <button
               onClick={() => navigate("/cart")}

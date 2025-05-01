@@ -3,7 +3,7 @@ import React from "react";
 const StatusView = ({ loading, error, empty }) => {
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen w-full">
+      <div className="flex justify-center items-center grow w-full">
         <svg
           className="opacity-50 w-20 h-20"
           viewBox="0 0 73 85"
@@ -49,16 +49,19 @@ const StatusView = ({ loading, error, empty }) => {
 
   if (error) {
     return (
-      <div className="flex justify-center items-center h-screen w-full">
-        <h2 className="text-2xl font-bold text-red-500">
-          Error al cargar los datos
-        </h2>
+      <div className="flex justify-center flex-col items-center grow w-full">
+        <img src="/assets/404.png" alt="" />
+        <h2 className="text-4xl font-bold text-gray-900">Oops!</h2>
+        <p className="text-lg text-gray-500">
+          Hubo un error al cargar los productos. Por favor, intenta de nuevo más
+          tarde.
+        </p>
       </div>
     );
   }
   if (empty) {
     return (
-      <div className="flex justify-center items-center h-screen w-full">
+      <div className="flex justify-center items-center grow w-full">
         <h2 className="text-2xl font-bold text-gray-500">
           No hay productos disponibles
         </h2>

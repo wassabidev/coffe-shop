@@ -1,5 +1,5 @@
 import express from "express";
-import { verificarToken, permitirRoles } from "../services/auth.js";
+import { verificarToken, permitirRoles } from "../middleware/auth.js";
 
 const router = express.Router();
 

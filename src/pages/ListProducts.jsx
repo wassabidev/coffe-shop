@@ -5,6 +5,7 @@ import Search from "../components/Search";
 import StatusView from "../components/StatusView";
 
 const ListProducts = () => {
+  const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,9 +27,13 @@ const ListProducts = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+  const activeSearch = inputValue !== "" ? inputValue : searchTerm;
 
-  const filtered = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm),
+  const filtered = products.filter(
+    (product) =>
+      product.name?.toLowerCase().includes(activeSearch.toLowerCase()) ||
+      product.category?.toLowerCase().includes(activeSearch.toLowerCase()) ||
+      product.type?.toLowerCase().includes(activeSearch.toLowerCase()),
   );
 
   const data = [
@@ -45,12 +50,17 @@ const ListProducts = () => {
       />
       {!loading && !error && (
         <main className="flex p-3 flex-grow sm:w-full sm:mx-auto md:m-0 md:w-11/12">
-          <SideBar data={data} />
+          <SideBar
+            data={data}
+            setSearchTerm={setSearchTerm}
+            resetInput={setInputValue}
+          />
           <div className="flex flex-col w-full">
             <Search
               className="flex justify-end mb-2"
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
+              searchTerm={inputValue}
+              setSearchTerm={setInputValue}
+              resetTerm={setSearchTerm}
             />
             <ul className="flex gap-5 flex-wrap ">
               {filtered.map((product) => (
