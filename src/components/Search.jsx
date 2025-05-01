@@ -1,7 +1,7 @@
-const Search = ({ searchTerm, setSearchTerm, className }) => {
+const Search = ({ searchTerm, setSearchTerm, resetTerm, className }) => {
   const handleSeach = (e) => {
     setSearchTerm(e.toLowerCase());
-    console.log(searchTerm);
+    resetTerm("");
   };
   return (
     <div className={className}>

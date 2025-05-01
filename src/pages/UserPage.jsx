@@ -1,7 +1,7 @@
-import { useAuth } from "../provider/authProvider";
+import { useSelector } from "react-redux";
 
 const UserPage = () => {
-  const { user } = useAuth();
+  const user = useSelector((state) => state.user);
   return (
     <div>
       {user.name} <br />
