@@ -2,10 +2,11 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../provider/authProvider";
+import { useDispatch } from "react-redux";
+import { setUser } from "../features/users/userSlice";
 
 const LoginPage = () => {
-  const { setToken, setUser } = useAuth();
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,8 +22,7 @@ const LoginPage = () => {
       });
       const token = response.data.token;
       const user = response.data.user;
-      setToken(token);
-      setUser(user);
+      dispatch(setUser({ token, user }));
       navigate("/");
     } catch (error) {
       console.error(
@@ -74,8 +74,7 @@ const LoginPage = () => {
               />
               {error && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                  <span className="font-medium">Oh, snapp!</span>
-                  Some error message.
+                  <span className="font-medium">Oh, snapp!</span> {error}
                 </p>
               )}
             </div>

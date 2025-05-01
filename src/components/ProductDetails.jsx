@@ -1,8 +1,10 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
 import { addItem } from "../features/cart/cartSlice";
 import ImagePlaceHolder from "/assets/product-placeholder.png";
 
 const ProductDetails = ({ product }) => {
+  const [loaded, setLoaded] = useState(false);
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
 
@@ -17,15 +19,26 @@ const ProductDetails = ({ product }) => {
       return;
     }
     dispatch(addItem(product));
-    console.log("add item: ", product);
   };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 items-start max-w-4xl mx-auto">
       <div className="w-full flex justify-center">
+        {!loaded && (
+          <img
+            src={ImagePlaceHolder}
+            className="absolute top-0 left-0 w-full h-auto opacity-50 animate-pulse"
+            alt="placeholder"
+          />
+        )}
         <img
           src={product.image ? `/uploads/${product.image}` : ImagePlaceHolder}
           alt={product.name}
-          className="rounded-md min-w-full h-auto"
+          onLoad={() => setLoaded(true)}
+          className={`rounded-md min-w-full h-auto transition-opacity duration-300 ${
+            loaded ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ viewTransitionName: `product-${product._id}` }}
         />
       </div>
       <div className="flex flex-col gap-4">
@@ -63,7 +76,7 @@ const ProductDetails = ({ product }) => {
         </div>
         <button
           onClick={() => handleAddItem(product)}
-          className="bg-emerald-700 cursor-pointer hover:bg-emerald-600 text-white py-2 px-4 rounded-md w-full"
+          className="bg-emerald-700 cursor-pointer hover:bg-emerald-600 !text-white py-2 px-4 rounded-md w-full"
         >
           Add to Cart
         </button>

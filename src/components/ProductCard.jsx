@@ -27,10 +27,20 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  const handleNavigate = () => {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        navigate(`/products/${product._id}`);
+      });
+    } else {
+      navigate(`/products/${product._id}`);
+    }
+  };
+
   return (
     <div
       className="cursor-pointer flex flex-col gap-2 p-3 rounded-md border-[0.1rem] border-gray-200"
-      onClick={() => navigate(`/products/${product._id}`)}
+      onClick={handleNavigate}
     >
       <div className="relative">
         <button
@@ -43,6 +53,7 @@ const ProductCard = ({ product }) => {
           src={!product.image ? DefaulImage : `/uploads/${product.image}`}
           className="w-3xs rounded-lg"
           alt=""
+          style={{ viewTransitionName: `product-${product._id}` }}
         />
       </div>
       <div className="flex items-start flex-col">

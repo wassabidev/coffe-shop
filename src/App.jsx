@@ -12,6 +12,7 @@ import Cart from "./pages/CartDetail";
 import ListProducts from "./pages/ListProducts";
 import ProductsDetails from "./pages/ProductsDetails";
 import Favorite from "./pages/Favorites";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -29,10 +30,16 @@ function App() {
         </Route>
 
         {/* Admin */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="products" element={<AdminProducts />} />
-          <Route path="categories" element={<AdminCategories />} />
-          {/* <Route path="users" element={<AdminUsers />} /> */}
+        <Route
+          element={
+            <ProtectedRoute allowedRoles={["admin", "cashier", "manager"]} />
+          }
+        >
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<AdminCategories />} />
+            {/* <Route path="users" element={<AdminUsers />} /> */}
+          </Route>
         </Route>
       </Routes>
     </Router>
