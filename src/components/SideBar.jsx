@@ -1,21 +1,20 @@
-import React, { useState } from "react";
-import { useAuth } from "../provider/authProvider";
+import { useState } from "react";
 import { FolderOutlined } from "@ant-design/icons";
 
-const SideBar = ({ data }) => {
+const SideBar = ({ data, setSearchTerm, resetInput }) => {
   const [selected, setSelected] = useState(null);
-  const { user } = useAuth();
 
   const handleSubcategoriaClick = (sub) => {
+    setSearchTerm(sub.toLowerCase());
     setSelected(sub);
-    console.log(sub);
+    resetInput("");
   };
 
   return (
-    <aside className="w-64 hidden md:block bg-white min-h-screen p-4 md:ml-8 lg:ml-12">
+    <aside className="w-64 hidden md:block bg-white min-h-dvh p-4 md:ml-8 lg:ml-12">
       {data.map((item, index) => (
         <div key={index} className="mb-4">
-          <h2 className="text-sm font-bold text-gray-600 mb-2 flex items-center gap-2">
+          <h2 className="text-xl font-bold text-gray-800 mb-2 flex items-center gap-2">
             {item.categoria}
           </h2>
           <ul className="space-y-1">
@@ -24,7 +23,7 @@ const SideBar = ({ data }) => {
                 key={i}
                 onClick={() => handleSubcategoriaClick(sub)}
                 className={`px-3 py-1 rounded-md cursor-pointer transition-colors duration-200 
-                ${selected === sub ? "bg-gray-100 text-gray-600" : "hover:bg-gray-100 text-gray-700"}`}
+                ${selected === sub ? "bg-gray-100 text-gray-700" : "hover:bg-gray-100 text-gray-500"}`}
               >
                 {sub}
               </li>

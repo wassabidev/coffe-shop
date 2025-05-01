@@ -7,15 +7,12 @@ import "./index.css";
 import { Provider } from "react-redux";
 import { store, persistor } from "./app/store";
 import { PersistGate } from "redux-persist/integration/react";
-import AuthProvider from "./provider/authProvider";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <AuthProvider>
-          <App />
-        </AuthProvider>
+        <App />
       </PersistGate>
     </Provider>
   </StrictMode>,
