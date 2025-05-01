@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon index.js",
+    "server": "npx nodemon index.js",
     "start": "node index.js",
     "test": "node test.js"
   },
