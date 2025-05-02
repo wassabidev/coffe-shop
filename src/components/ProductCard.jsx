@@ -44,7 +44,7 @@ const ProductCard = ({ product }) => {
     >
       <div className="relative">
         <button
-          className={`absolute cursor-pointer top-2 right-2`}
+          className={`absolute z-10 cursor-pointer top-2 right-2`}
           onClick={(event) => handleFavorite(event, product)}
         >
           <HeartICon color={isFavorited} />
