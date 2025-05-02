@@ -52,55 +52,70 @@ const Header = () => {
       )}
 
       <ul className="flex items-center justify-between !m-0">
-        <section className="flex md:hidden">
-          <div
-            className="space-y-2 cursor-pointer"
-            onClick={() => setIsNavOpen((prev) => !prev)}
-          >
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
-          </div>
+        <button
+          onClick={() => navigate("/cart")}
+          className="hidden md:block w-10 h-10 cursor-pointer"
+        >
+          <img src="/assets/logocat.svg" alt="" />
+        </button>
 
-          <div
-            className={
-              isNavOpen
-                ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-10 "
-                : "hidden"
-            }
+        <div
+          className="space-y-2 block md:hidden cursor-pointer"
+          onClick={() => setIsNavOpen((prev) => !prev)}
+        >
+          <span className="block h-0.5 w-8 bg-gray-600"></span>
+          <span className="block h-0.5 w-8 bg-gray-600"></span>
+          <span className="block h-0.5 w-8 bg-gray-600"></span>
+        </div>
+
+        <div>
+          <button
+            onClick={() => navigate("/cart")}
+            className="w-10 h-10 md:hidden cursor-pointer flex items-center justify-center )"
           >
-            <div
-              className="absolute top-0 right-0 px-8 py-8"
-              onClick={() => setIsNavOpen(false)}
+            <img src="/assets/logocat.svg" alt="" />
+          </button>
+        </div>
+
+        <div
+          className={
+            isNavOpen
+              ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-10 "
+              : "hidden"
+          }
+        >
+          <div
+            className="absolute top-0 right-0 px-8 py-8"
+            onClick={() => setIsNavOpen(false)}
+          >
+            <svg
+              className="h-8 w-8 text-gray-600"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg
-                className="h-8 w-8 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </div>
-            <ul className="flex flex-col items-center justify-between min-h-[250px]">
-              <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/about">About</a>
-              </li>
-              <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/portfolio">Portfolio</a>
-              </li>
-              <li className="border-b border-gray-400 my-8 uppercase">
-                <a href="/contact">Contact</a>
-              </li>
-            </ul>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </div>
-        </section>
+          <ul className="flex flex-col items-center justify-between min-h-[250px]">
+            <li className="border-b border-gray-400 my-8 uppercase">
+              <a href="/about">About</a>
+            </li>
+            <li className="border-b border-gray-400 my-8 uppercase">
+              <a href="/portfolio">Portfolio</a>
+            </li>
+            <li className="border-b border-gray-400 my-8 uppercase">
+              <a href="/contact">Contact</a>
+            </li>
+          </ul>
+        </div>
+
         <div className="hidden md:flex gap-3">
-          {navItems.map(({ label, path, icon }) => (
+          {navItems.map(({ label, path }) => (
             <NavLink
               key={path}
               to={path}
@@ -112,7 +127,6 @@ const Header = () => {
                 }`
               }
             >
-              {icon}
               <span>{label}</span>
             </NavLink>
           ))}
@@ -136,7 +150,7 @@ const Header = () => {
               <div className="py-1" aria-labelledby="dropdownDefaultButton">
                 {userData && (
                   <>
-                    <div>
+                    <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 bg-slate-50">
                       {userData.name}
                       {userData.email}
                     </div>
