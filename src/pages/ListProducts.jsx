@@ -48,7 +48,7 @@ const ListProducts = () => {
         error={error}
         empty={products.length === 0}
       />
-      {!loading && !error && (
+      {!loading && !error && products.length !== 0 && (
         <main className="flex p-3 flex-grow sm:w-full sm:mx-auto md:m-0 md:w-11/12">
           <SideBar
             data={data}

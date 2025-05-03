@@ -70,7 +70,7 @@ const LoginPage = () => {
                     ? "bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
                     : ""
                 } 
-                   !mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5`}
+                  !mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5`}
               />
               {error && (
                 <p className="mt-2 text-sm text-red-600 dark:text-red-500">

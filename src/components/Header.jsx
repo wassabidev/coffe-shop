@@ -53,7 +53,7 @@ const Header = () => {
 
       <ul className="flex items-center justify-between !m-0">
         <button
-          onClick={() => navigate("/cart")}
+          onClick={() => navigate("/")}
           className="hidden md:block w-10 h-10 cursor-pointer"
         >
           <img src="/assets/logocat.svg" alt="" />
@@ -70,7 +70,7 @@ const Header = () => {
 
         <div>
           <button
-            onClick={() => navigate("/cart")}
+            onClick={() => navigate("/")}
             className="w-10 h-10 md:hidden cursor-pointer flex items-center justify-center )"
           >
             <img src="/assets/logocat.svg" alt="" />
@@ -80,12 +80,12 @@ const Header = () => {
         <div
           className={
             isNavOpen
-              ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-10 "
+              ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-20 "
               : "hidden"
           }
         >
           <div
-            className="absolute top-0 right-0 px-8 py-8"
+            className="absolute top-0 right-0 px-8 py-8 cursor-pointer"
             onClick={() => setIsNavOpen(false)}
           >
             <svg
@@ -102,15 +102,23 @@ const Header = () => {
             </svg>
           </div>
           <ul className="flex flex-col items-center justify-between min-h-[250px]">
-            <li className="border-b border-gray-400 my-8 uppercase">
-              <a href="/about">About</a>
-            </li>
-            <li className="border-b border-gray-400 my-8 uppercase">
-              <a href="/portfolio">Portfolio</a>
-            </li>
-            <li className="border-b border-gray-400 my-8 uppercase">
-              <a href="/contact">Contact</a>
-            </li>
+            {navItems.map(({ label, path }) => (
+              <NavLink
+                key={path}
+                to={path}
+                onClick={() => setIsNavOpen(false)}
+                end
+                className={({ isActive }) =>
+                  `flex flex-col px-3 py-2 rounded ${
+                    isActive
+                      ? " after:bg-green-200 after:h-1 after:rounded-lg content-[''] after:w-full text-green-800"
+                      : "text-gray-700 hover:bg-gray-200"
+                  }`
+                }
+              >
+                <span>{label}</span>
+              </NavLink>
+            ))}
           </ul>
         </div>
 
