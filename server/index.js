@@ -5,6 +5,7 @@ import cors from "cors";
 import productRoutes from "./routes/productRoutes.js";
 import loginRoutes from "./routes/loginRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -18,7 +19,7 @@ app.use("/uploads", express.static("../public/uploads"));
 app.use("/api/products", productRoutes);
 
 app.use("/api", loginRoutes);
-app.use("/api", loginRoutes);
+app.use("/api/category", categoryRoutes);
 app.use("/api", loginRoutes);
 
 app.use("/api/admin", adminRoutes);

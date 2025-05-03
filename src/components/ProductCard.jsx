@@ -43,18 +43,18 @@ const ProductCard = ({ product }) => {
       onClick={handleNavigate}
     >
       <div className="relative">
-        <button
-          className={`absolute z-10 cursor-pointer top-2 right-2`}
-          onClick={(event) => handleFavorite(event, product)}
-        >
-          <HeartICon color={isFavorited} />
-        </button>
         <img
           src={!product.image ? DefaulImage : `/uploads/${product.image}`}
           className="w-3xs rounded-lg"
           alt=""
           style={{ viewTransitionName: `product-${product._id}` }}
         />
+        <button
+          className={`absolute  cursor-pointer top-2 right-2`}
+          onClick={(event) => handleFavorite(event, product)}
+        >
+          <HeartICon color={isFavorited} />
+        </button>
       </div>
       <div className="flex items-start flex-col">
         <h5>{product.name}</h5>

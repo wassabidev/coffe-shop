@@ -3,6 +3,7 @@ import {
   createProduct,
   getProducts,
   getProductById,
+  deleteProduct,
 } from "../controllers/productController.js";
 
 import multer from "multer";
@@ -23,5 +24,6 @@ const upload = multer({ storage: storage });
 router.post("/", upload.single("image"), createProduct);
 router.get("/", getProducts);
 router.get("/:id", getProductById);
+router.delete("/:id", deleteProduct);
 
 export default router;

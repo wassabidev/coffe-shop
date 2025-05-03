@@ -60,6 +60,10 @@ export const login = async (req, res) => {
       token,
       user: { name: user.name, email: user.email, role: user.role },
     });
+    console.log({
+      token,
+      user: { name: user.name, email: user.email, role: user.role },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Login failed", error: error.message });
