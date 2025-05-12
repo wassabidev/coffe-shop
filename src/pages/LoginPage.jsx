@@ -1,80 +1,118 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../features/users/userSlice";
+import LoginFooter from "../components/LoginFooter";
+import { Navigate } from "react-router-dom";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import toast, { Toaster } from "react-hot-toast";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const formSchema = z.object({
+    email: z.string().email("Correo no válido"),
+    password: z
+      .string()
+      //cambiar minimo a 8
+      .min(1, "La contraseña debe tener al menos 8 caracteres")
+      .regex(/[a-zA-Z]/, "La contraseña debe contener al menos una letra")
+      .regex(/[0-9]/, "La contraseña debe contener al menos un número"),
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(formSchema),
+  });
 
+  if (isAuthenticated) {
+    return <Navigate to="/" />;
+  }
+
+  const onSubmit = async (data) => {
     try {
       const response = await axios.post("http://localhost:5001/api/login", {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
       });
       const token = response.data.token;
       const user = response.data.user;
-      dispatch(setUser({ token, user }));
+      const refreshToken = response.data.refreshToken;
+      dispatch(setUser({ token, user, refreshToken }));
       navigate("/");
     } catch (error) {
+      //esto  cambiar por un div en la parte superior
+      // del form
       console.error(
         "error al iniciar sesión",
         error.response?.data?.mensaje || error.message,
       );
-      setError(error.response?.data?.mensaje || "Error desconocido");
+      toast.error(error.response?.data?.mensaje || "Error al iniciar sesión");
     }
   };
 
   return (
-    <div className="flex h-dvh gap-3 w-full">
+    <div className="flex h-dvh w-full">
+      <Toaster />
       <div className="bg-[#FFC671] bg-opacity-50 hidden md:flex items-center justify-center w-1/2">
         <img src="/assets/michi.svg" className="w-2xs" alt="" />
       </div>
-      <div className="flex justify-center items-center w-full md:w-1/2 relative">
+      <div className="grid grid-rows-[1fr_auto] place-items-center items-center w-full md:w-1/2 relative">
         <img
           src="/assets/logocat.svg"
           alt=""
-          className="absolute top-5 left-5"
+          className="absolute top-3 left-3"
         />
-        <div className="bg-slate-50 rounded-md p-10 w-5/6  lg:w-1/2">
+        <div className="bg-slate-50 self-center rounded-md p-10 w-5/6 sm:w-2/4 lg:w-1/2">
           <div className="!mb-5">
             <h1 className="text-2xl">Iniciar Sesion</h1>
             <p className="text-md text-gray-600">¡Bienvenido! </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-3"
+          >
             <div>
               <label htmlFor="email">Correo</label>
               <input
                 type="text"
-                onChange={(e) => setEmail(e.target.value)}
-                className="!mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5"
+                {...register("email")}
+                onChange={() => clearErrors("email")}
+                className={`${
+                  errors.email
+                    ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
+                    : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
+                } !mt-2 text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="password">Contraseña</label>
               <input
                 type="password"
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
+                onChange={() => clearErrors("email")}
                 className={`${
-                  error
-                    ? "bg-red-50 border border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
-                    : ""
-                } 
-                  !mt-2 bg-gray-50 border-[0.1rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:border-blue-400 block w-full md:w-11/12 p-2.5`}
+                  errors.password
+                    ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
+                    : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
+                } !mt-2  text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
               />
-              {error && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-500">
-                  <span className="font-medium">Oh, snapp!</span> {error}
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
                 </p>
               )}
             </div>
@@ -88,6 +126,7 @@ const LoginPage = () => {
             </button>
           </form>
         </div>
+        <LoginFooter />
       </div>
     </div>
   );

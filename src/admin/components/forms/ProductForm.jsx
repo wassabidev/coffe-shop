@@ -1,8 +1,21 @@
-import { Modal, Form, Input, Select, InputNumber, Radio } from "antd";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectItem,
+  SelectContent,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { useForm, Controller } from "react-hook-form";
-
-const { Option } = Select;
 
 export default function ProductModalForm({
   open,
@@ -13,32 +26,24 @@ export default function ProductModalForm({
   const [preview, setPreview] = useState(null);
   const [previewFile, setPreviewFile] = useState(null);
 
-  const { control, handleSubmit, reset, setValue } = useForm({
-    default: {
+  const { control, handleSubmit, reset, setValue, register } = useForm({
+    defaultValues: {
+      name: "",
+      category: "",
       types: [],
+      price: 0,
+      description: "",
+      stock: "Si",
     },
   });
 
   const handleOk = handleSubmit((data) => {
-    console.log(data);
-    onSubmit(data);
+    onSubmit({ ...data, imagen: previewFile });
+    console.log("data", data);
     reset();
     setPreview(null);
     setPreviewFile(null);
   });
-
-  const optionsWithDisabled = [
-    { label: "Si", value: "Si" },
-    { label: "No", value: "No" },
-  ];
-  const categoryTypes = [
-    "Caliente",
-    "Frío",
-    "Vegetariano",
-    "Sin gluten",
-    "Con cafeína",
-    "Sin cafeína",
-  ];
 
   useEffect(() => {
     if (!previewFile) {
@@ -47,152 +52,131 @@ export default function ProductModalForm({
     }
 
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
+    reader.onloadend = () => setPreview(reader.result);
     reader.readAsDataURL(previewFile);
   }, [previewFile]);
 
   return (
-    <Modal
-      open={open}
-      title={isUpdate ? "Editar Producto" : "Agregar nuevo producto"}
-      onCancel={() => {
-        onCancel();
-        reset();
-        setPreview(null);
-        setPreviewFile(null);
-      }}
-      onOk={handleOk}
-      okText="Guardar"
-    >
-      <Form layout="vertical">
-        <Form.Item label="Imagen" required>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              if (file) {
-                setPreviewFile(file);
-                setValue("imagen", file, { shouldValidate: true }); // 🔥 RHF guarda el file
-              }
-            }}
-            className="block w-full rounded-md border border-[#d9d9d9] px-[11px] py-1 text-[14px] text-[#000000d9] bg-white transition duration-300 focus:border-[#4096ff] hover:border-[#4096ff] focus:shadow-[0_0_0_2px_rgba(24,144,255,0.2)] focus:outline-none"
-          />
-        </Form.Item>
+    <Dialog open={open} onOpenChange={(val) => !val && onCancel()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {isUpdate ? "Editar Producto" : "Agregar nuevo producto"}
+          </DialogTitle>
+        </DialogHeader>
 
-        {previewFile && preview && (
-          <div className="mb-4">
-            <img
-              src={preview}
-              alt="Preview"
-              className="max-h-40 rounded border"
-              onError={() => setPreview(null)}
+        <form onSubmit={handleOk} className="space-y-4">
+          <div>
+            <Label>Imagen</Label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setPreviewFile(file);
+                  setValue("imagen", file);
+                }
+              }}
+            />
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-2 max-h-40 rounded border"
+              />
+            )}
+          </div>
+
+          <div>
+            <Label>Nombre</Label>
+            <Input {...register("name", { required: true })} />
+          </div>
+
+          <div>
+            <Label>Categoría</Label>
+            <Controller
+              name="category"
+              control={control}
+              {...register("category", { required: true })}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full" />
+                  <SelectContent>
+                    <SelectItem value="Bebida">Bebida</SelectItem>
+                    <SelectItem value="Comida">Comida</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             />
           </div>
-        )}
 
-        <Form.Item label="Nombre" required>
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: "Campo requerido" }}
-            render={({ field }) => <Input {...field} />}
-          />
-        </Form.Item>
+          <div>
+            <Label>Tipos asociados</Label>
+            <Controller
+              name="tipo"
+              control={control}
+              {...register("types")}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full" />
+                  <SelectContent>
+                    <SelectItem value="Bebida">Frio</SelectItem>
+                    <SelectItem value="Comida">Caliente</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </div>
 
-        <Form.Item label="Categoría" required>
-          <Controller
-            name="category"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <Select {...field} placeholder="Seleccionar categoría">
-                <Option value="Bebida">Bebida</Option>
-                <Option value="Comida">Comida</Option>
-              </Select>
-            )}
-          />
-        </Form.Item>
+          <div>
+            <Label>Precio</Label>
+            <Input
+              type="number"
+              {...register("price", { valueAsNumber: true, required: true })}
+            />
+          </div>
 
-        {/* <Form.Item label="Tipo" required>
-                    <Controller
-                        name="currency"
-                        control={control}
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                            <Select {...field} placeholder="Seleccionar Tipo">
-                                <Option value="Caliente">Caliente</Option>
-                                <Option value="Frio">Frio</Option>
-                            </Select>
-                        )}
+          <div>
+            <Label>Descripción</Label>
+            <Textarea {...register("description")} rows={3} />
+          </div>
+
+          <div>
+            <Label>Stock</Label>
+            <Controller
+              name="stock"
+              control={control}
+              render={({ field }) => (
+                <div className="flex gap-4">
+                  <label>
+                    <input
+                      type="radio"
+                      value="Si"
+                      checked={field.value === "Si"}
+                      onChange={field.onChange}
                     />
-                </Form.Item> */}
-        <Form.Item label="Tipos asociados" required>
-          <Controller
-            name="types"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                mode="multiple"
-                allowClear
-                placeholder="Seleccionar tipos relacionados"
-              >
-                {categoryTypes.map((type) => (
-                  <Option key={type} value={type}>
-                    {type}
-                  </Option>
-                ))}
-              </Select>
-            )}
-          />
-        </Form.Item>
+                    <span className="ml-2">Si</span>
+                  </label>
+                  <label>
+                    <input
+                      type="radio"
+                      value="No"
+                      checked={field.value === "No"}
+                      onChange={field.onChange}
+                    />
+                    <span className="ml-2">No</span>
+                  </label>
+                </div>
+              )}
+            />
+          </div>
 
-        <Form.Item label="Precio" required>
-          <Controller
-            name="price"
-            control={control}
-            rules={{ required: true }}
-            render={({ field }) => (
-              <InputNumber
-                {...field}
-                className="w-full"
-                min={0}
-                formatter={(val) =>
-                  `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                }
-                parser={(val) => val?.replace(/\./g, "")}
-              />
-            )}
-          />
-        </Form.Item>
-
-        <Form.Item label="Descripción">
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => <Input.TextArea rows={3} {...field} />}
-          />
-        </Form.Item>
-
-        <Form.Item label="Stock">
-          <Controller
-            name="stock"
-            control={control}
-            rules={{ required: "Campo requerido" }}
-            render={({ field }) => (
-              <Radio.Group
-                {...field}
-                options={optionsWithDisabled}
-                optionType="button"
-                buttonStyle="solid"
-              />
-            )}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
+          <Button type="submit" className="w-full mt-4">
+            Guardar
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { logout } from "../features/users/userSlice";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +25,7 @@ const Header = () => {
   const Avatar = () => {
     return (
       <div
-        className={`${isAuthenticated && "p-4"} flex justify-center items-center w-10 h-10 bg-slate-200 rounded-full`}
+        className={`${isAuthenticated ? "p-4" : "p-2"} flex justify-center items-center w-10 h-10 bg-slate-200 rounded-full`}
       >
         {isAuthenticated && userData ? (
           <p className="!m-0 !text-xl font-semmibold">
@@ -47,7 +48,7 @@ const Header = () => {
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="z-10 absolute top-0 left-0  h-dvh w-dvw"
+          className="z-10 absolute top-0 left-0 h-dvh w-dvw"
         ></div>
       )}
 
@@ -159,16 +160,15 @@ const Header = () => {
                 {userData && (
                   <>
                     <div className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100 bg-slate-50">
-                      {userData.name}
-                      {userData.email}
+                      <p className="!mb-0 py-1">{userData.email}</p>
                     </div>
-                    <a
-                      href="#"
+                    <Link
+                      to="/user"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-slate-100"
                       role="menuitem"
                     >
                       Account settings
-                    </a>
+                    </Link>
                   </>
                 )}
 

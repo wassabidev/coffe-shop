@@ -1,14 +1,23 @@
 import { useState } from "react";
 import PageHeader from "../components/PageHeader";
-import { Table, Button, Input, Tag, Space, Dropdown, Menu } from "antd";
+import { Button } from "@/components/ui/button";
 import {
-  MoreOutlined,
-  EyeOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
 import CategorieModal from "../components/forms/CategorieForm";
-import { createStyles } from "antd-style";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
 
 const categories = [
   {
@@ -30,25 +39,6 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dataSource, setDataSource] = useState(categories);
 
-  const useStyle = createStyles(({ css }) => ({
-    customTable: css`
-      .ant-table-container {
-        overflow-x: auto !important;
-      }
-
-      .ant-table-content {
-        overflow-x: auto !important;
-        overflow-y: hidden !important;
-      }
-
-      .ant-table-body {
-        scrollbar-width: thin;
-        scrollbar-color: #eaeaea transparent;
-        scrollbar-gutter: stable;
-      }
-    `,
-  }));
-
   const handleAddProduct = (newProduct) => {
     const id = dataSource.length + 1;
     setDataSource([...dataSource, { id, ...newProduct }]);
@@ -59,60 +49,6 @@ export default function Categories() {
     product.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const columns = [
-    {
-      title: "Categoría",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Tipos",
-      dataIndex: "types",
-      key: "types",
-      render: (types) => types.map((t) => <Tag key={t}>{t}</Tag>),
-    },
-    {
-      title: "Descripción",
-      dataIndex: "description",
-      key: "description",
-    },
-    {
-      title: "Acciones",
-      key: "actions",
-      fixed: "right",
-      width: 100,
-      render: (_, record) => {
-        const menuItems = [
-          {
-            key: "show",
-            icon: <EyeOutlined />,
-            label: "Mostrar",
-            onClick: () => console.log("Mostrar", record),
-          },
-          {
-            key: "edit",
-            icon: <EditOutlined />,
-            label: "Editar",
-            onClick: () => console.log("Editar", record),
-          },
-          {
-            key: "delete",
-            icon: <DeleteOutlined />,
-            label: "Eliminar",
-            danger: true,
-            onClick: () => console.log("Eliminar", record),
-          },
-        ];
-
-        return (
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <Button icon={<MoreOutlined />} />
-          </Dropdown>
-        );
-      },
-    },
-  ];
-  const { styles } = useStyle();
   return (
     <>
       <PageHeader
@@ -123,16 +59,65 @@ export default function Categories() {
         addTitle={"Agregar Categoria"}
         onRefresh={() => setSearch("")}
         onAdd={() => setIsModalOpen(true)}
-      ></PageHeader>
-
-      <Table
-        columns={columns}
-        dataSource={filteredData}
-        rowKey="id"
-        className={styles.customTable}
-        pagination={{ pageSize: 5 }}
-        scroll={{ x: 1100 }}
       />
+
+      <div className="rounded-md border w-full overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Categoría</TableHead>
+              <TableHead>Tipos</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {row.types.map((type) => (
+                      <Badge key={type} variant="outline">
+                        {type}
+                      </Badge>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>{row.description}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => console.log("Mostrar", row)}
+                      >
+                        <Eye className="mr-2 h-4 w-4" /> Mostrar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => console.log("Editar", row)}
+                      >
+                        <Edit className="mr-2 h-4 w-4" /> Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => console.log("Eliminar", row)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4 text-red-500" />
+                        <span className="text-red-500">Eliminar</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
       <CategorieModal
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}

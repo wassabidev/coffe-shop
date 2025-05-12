@@ -1,15 +1,22 @@
-import React from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Delete from "../components/ui/Delete";
 import Edit from "../components/ui/Edit";
 import { formatPrice } from "../utils/price";
-import { addItem, removeItem } from "../features/cart/cartSlice";
+import { addItem, removeItem, clearCart } from "../features/cart/cartSlice";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "./api/axiosInstance";
+import toast, { Toaster } from "react-hot-toast";
+import Modal from "@/components/ui/Modal";
+import { Link } from "react-router-dom";
 
 const CartDetail = () => {
-  const cartItems = useSelector((store) => store.cart.items);
+  const [showModal, setShowModal] = useState(true);
+  const [lastOrder, setLastOrder] = useState(null);
+  const { items: cartItems, total } = useSelector((store) => store.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   const handleAdd = (event, item) => {
     event.stopPropagation();
@@ -22,79 +29,123 @@ const CartDetail = () => {
     console.log(item._id);
   };
 
-  if (cartItems.length === 0) {
-    return (
-      <div className="flex flex-col gap-5">
-        <h1 className="text-2xl font-bold">No hay productos en el carrito</h1>
-        <p className="text-lg font-bold">
-          Agrega productos al carrito para verlos aquí.
-        </p>
-      </div>
-    );
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error("Debes iniciar sesión para confirmar la compra", {
+        position: "top-center",
+      });
+      return;
+    }
+    try {
+      const res = await axiosInstance.post("/order", {
+        items: cartItems,
+        total,
+      });
+      setLastOrder(res.data);
+      setShowModal(true);
+      dispatch(clearCart());
+    } catch (error) {
+      console.error(
+        "error al confirmar la orden",
+        error.response?.data?.mensaje || error.message,
+      );
+      toast.error(`Error al crear la orden ${error}`, {
+        position: "top-center",
+      });
+    }
+  };
 
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  console.log(cartItems);
   return (
     <div className="md:max-w-4/5 w-full md:mx-auto">
-      <h1 className="text-2xl font-bold">Ver ordenes</h1>
-      {cartItems.map((item) => (
-        <div
-          onClick={() => navigate(`/products/${item._id}`)}
-          key={item._id}
-          className="flex flex-col gap-2 cursor-pointer rounded-lg shadow-md border-gray-400 p-5 my-5 lg:m-5 w-full"
-        >
-          <div className="flex gap-4 items-center">
-            <img
-              src={`/uploads/${item.image}`}
-              alt={item.name}
-              className="w-25 h-25 rounded-full"
-            />
-            <div className="w-full">
-              <div className="flex gap-2 items-center justify-between">
-                <h2 className="text-lg font-bold !mb-1">{item.name}</h2>
-                <p className="text-lg font-bold !mb-1">
-                  {formatPrice(item.price * item.quantity)}
-                </p>
-              </div>
-              <p className="text-left">{item.description}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <button
-              className="cursor-pointer"
-              onClick={(event) => handleDelete(event, item)}
-            >
-              <Delete />
-            </button>
-            <p className="flex items-end !mb-0">{item.quantity}</p>
-            <button
-              className="cursor-pointer"
-              onClick={(event) => handleAdd(event, item)}
-            >
-              <Edit />
-            </button>
-          </div>
-        </div>
-      ))}
-
-      <hr className="my-4 border-t border-gray-200" />
-
-      <div className="!mt-4 w-full max-w-1/2 ml-auto">
-        <div className="mb-3 flex !mt-1 items-end">
-          <p className="font-semibold !mb-2">Total</p>
-          <div className="flex-grow m-0 h-3 dots"></div>
-          <p className="text-lg font-semibold !mb-2">{formatPrice(total)}</p>
-        </div>
-        <button className="!ml-auto block !mt-4">
-          <p className="text-lg font-semibold text-white bg-black px-4 py-2 rounded-md">
-            Confirmar compra
+      <Toaster />
+      {showModal && lastOrder && (
+        <Modal order={lastOrder} setShowModal={setShowModal} />
+      )}
+      {cartItems.length == 0 && (
+        <div className="flex h-full flex-col items-center justify-center">
+          <h1 className="text-3xl text-center font-semibold mb-2">
+            No hay productos en el carrito
+          </h1>
+          <p className="text-lg text-center text-gray-600 font-semibold">
+            Agrega productos al carrito para verlos aquí.
           </p>
-        </button>
-      </div>
+          <Link
+            to={"/"}
+            className="text-medium mt-3 font-regular text-white bg-green-900 px-4 py-2 rounded-md"
+          >
+            Volver al inicio
+          </Link>
+        </div>
+      )}
+      {cartItems.length > 0 && (
+        <>
+          <h1 className="text-2xl font-bold">Ver ordenes</h1>
+          {cartItems.map((item) => (
+            <div
+              onClick={() => navigate(`/products/${item.product._id}`)}
+              key={item.product._id}
+              className="flex flex-col gap-2 cursor-pointer rounded-lg shadow-md border-gray-400 p-5 my-5 lg:m-5 w-full"
+            >
+              <div className="flex gap-4 items-center">
+                <img
+                  src={`/uploads/${item.product.image}`}
+                  alt={item.product.name}
+                  className="w-25 h-25 rounded-full"
+                />
+                <div className="w-full">
+                  <div className="flex lg:gap-2 flex-wrap items-center justify-between">
+                    <h2 className="text-lg font-bold !mb-1">
+                      {item.product.name}
+                    </h2>
+                    <p className="text-lg font-bold  !mb-1">
+                      {formatPrice(item.product.price * item.quantity)}
+                    </p>
+                  </div>
+                  <p className="text-left text-gray-500">
+                    {item.product.description}
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="cursor-pointer"
+                  onClick={(event) => handleDelete(event, item)}
+                >
+                  <Delete />
+                </button>
+                <p className="flex items-end !mb-0">{item.quantity}</p>
+                <button
+                  className="cursor-pointer"
+                  onClick={(event) => handleAdd(event, item)}
+                >
+                  <Edit />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          <hr className="my-4 border-t border-gray-200" />
+
+          <div className="my-4 w-full md:max-w-1/2 ml-auto">
+            <div className="mb-3 flex !mt-1 items-end">
+              <p className="font-semibold !mb-2">Total</p>
+              <div className="flex-grow m-0 h-3 dots"></div>
+              <p className="text-lg font-semibold !mb-2">
+                {formatPrice(total)}
+              </p>
+            </div>
+            <button
+              onClick={handleSubmit}
+              className="ml-auto block !mt-4 cursor-pointer"
+            >
+              <span className="text-lg font-semibold text-white bg-green-900 px-4 py-2 rounded-md">
+                Confirmar compra
+              </span>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

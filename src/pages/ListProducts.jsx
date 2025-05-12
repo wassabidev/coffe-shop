@@ -4,18 +4,30 @@ import SideBar from "../components/SideBar";
 import Search from "../components/Search";
 import StatusView from "../components/StatusView";
 
+import axiosInstance from "./api/axiosInstance";
+
 const ListProducts = () => {
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch("http://localhost:5001/api/products");
-      const data = await response.json();
-      setProducts(data);
+      axiosInstance.get("/products").then((res) => setProducts(res.data));
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      console.error("Error al obtener los productos", error);
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      axiosInstance.get("/category").then((res) => setCategories(res.data));
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -26,6 +38,7 @@ const ListProducts = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
   const activeSearch = inputValue !== "" ? inputValue : searchTerm;
 
@@ -35,11 +48,6 @@ const ListProducts = () => {
       product.category?.toLowerCase().includes(activeSearch.toLowerCase()) ||
       product.type?.toLowerCase().includes(activeSearch.toLowerCase()),
   );
-
-  const data = [
-    { categoria: "Bebidas", subcategorias: ["Cafe caliente", "Cafe frio"] },
-    { categoria: "Comida", subcategorias: ["Dulce", "Salado"] },
-  ];
 
   return (
     <>
@@ -51,7 +59,7 @@ const ListProducts = () => {
       {!loading && !error && products.length !== 0 && (
         <main className="flex p-3 flex-grow sm:w-full sm:mx-auto md:m-0 md:w-11/12">
           <SideBar
-            data={data}
+            data={categories}
             setSearchTerm={setSearchTerm}
             resetInput={setInputValue}
           />
