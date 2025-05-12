@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Session from "../models/Session.js";
+
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
@@ -8,22 +10,25 @@ export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     //buscar en la bd si ya existe user con el mismo email
-    //const user = await authService.getUseryEmail(email);
 
-    /* if (user) {
+    const userExist = await User.exists({ email });
+
+    if (userExist) {
       res.status(403).json({ message: "Usuario con email ya exite" });
-    } */
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
       role,
+      active: true,
     });
 
     await newUser.save();
     res.status(201).json(newUser);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error al crear el usuario", error });
   }
 };
@@ -52,20 +57,47 @@ export const login = async (req, res) => {
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "2h",
+        expiresIn: "30s",
       },
     );
 
+    const session = await new Session({
+      userId: user._id,
+      userAgent: req.headers["user-agent"],
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+    }).save();
+
+    const refreshToken = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        session: session._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "30d",
+      },
+    );
+
+    session.refreshToken = refreshToken;
+    await session.save();
+
     res.json({
       token,
-      user: { name: user.name, email: user.email, role: user.role },
-    });
-    console.log({
-      token,
-      user: { name: user.name, email: user.email, role: user.role },
+      refreshToken,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Login failed", error: error.message });
+    res.status(500).json({
+      message: "Algo fallo al intentar loggearse",
+      error: error.message,
+    });
   }
 };

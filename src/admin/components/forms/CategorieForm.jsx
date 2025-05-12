@@ -1,7 +1,15 @@
-import { Modal, Form, Input, Select } from "antd";
-import { useForm, Controller } from "react-hook-form";
-
-const { Option } = Select;
+import { useForm } from "react-hook-form";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
 export default function CategoryModalForm({
   open,
@@ -9,7 +17,7 @@ export default function CategoryModalForm({
   onSubmit,
   isUpdate = false,
 }) {
-  const { control, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm();
 
   const handleOk = handleSubmit((data) => {
     onSubmit(data);
@@ -17,34 +25,41 @@ export default function CategoryModalForm({
   });
 
   return (
-    <Modal
+    <Dialog
       open={open}
-      title={isUpdate ? "Editar Categoría" : "Agregar nueva Categoría"}
-      onCancel={() => {
-        onCancel();
-        reset();
+      onOpenChange={(val) => {
+        if (!val) {
+          onCancel();
+          reset();
+        }
       }}
-      onOk={handleOk}
-      okText="Guardar"
     >
-      <Form layout="vertical">
-        <Form.Item label="Nombre" required>
-          <Controller
-            name="name"
-            control={control}
-            rules={{ required: "Campo requerido" }}
-            render={({ field }) => <Input {...field} />}
-          />
-        </Form.Item>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {isUpdate ? "Editar Categoría" : "Agregar nueva Categoría"}
+          </DialogTitle>
+        </DialogHeader>
 
-        <Form.Item label="Descripción">
-          <Controller
-            name="description"
-            control={control}
-            render={({ field }) => <Input.TextArea rows={3} {...field} />}
-          />
-        </Form.Item>
-      </Form>
-    </Modal>
+        <form onSubmit={handleOk} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nombre</Label>
+            <Input
+              id="name"
+              {...register("name", { required: "Campo requerido" })}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="description">Descripción</Label>
+            <Textarea id="description" rows={3} {...register("description")} />
+          </div>
+
+          <DialogFooter>
+            <Button type="submit">Guardar</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

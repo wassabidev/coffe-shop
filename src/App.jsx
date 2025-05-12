@@ -10,23 +10,35 @@ import NoFound from "./pages/NotFound";
 import LoginPage from "./pages/LoginPage";
 import Cart from "./pages/CartDetail";
 import ListProducts from "./pages/ListProducts";
-import ProductsDetails from "./pages/ProductsDetails";
+import ProductsDetailsPage from "./pages/ProductsDetailsPage";
 import Favorite from "./pages/Favorites";
+import SignUpPage from "./pages/SignUpPage";
+import UserPage from "./pages/UserPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { useSelector } from "react-redux";
 
 function App() {
+  const { isAuthenticated } = useSelector((state) => state.user);
   return (
     <Router>
       <Routes>
         <Route path="*" element={<NoFound />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
 
         {/* Cliente */}
         <Route element={<Layout />}>
           <Route path="/" element={<ListProducts />} />
-          <Route path="/products/:id" element={<ProductsDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/favorites" element={<Favorite />} />
+          <Route
+            path="/user"
+            element={<UserPage isAuthenticated={isAuthenticated} />}
+          />
+        </Route>
+
+        <Route element={<Layout noPadding={true} />}>
+          <Route path="/products/:id" element={<ProductsDetailsPage />} />
         </Route>
 
         {/* Admin */}

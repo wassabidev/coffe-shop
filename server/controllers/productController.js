@@ -22,7 +22,7 @@ export const createProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().populate("category");
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });
@@ -33,7 +33,11 @@ export const getProductById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const products = await Product.findById(id);
+    const products = await Product.findById(id).populate("category");
+    //console.log("Productos encontrados:", products);
+    if (!products) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });

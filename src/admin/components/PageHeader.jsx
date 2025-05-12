@@ -1,12 +1,6 @@
-import {
-  LeftOutlined,
-  ReloadOutlined,
-  PlusOutlined,
-  SearchOutlined,
-} from "@ant-design/icons";
-import { Input, Button, Typography } from "antd";
-
-const { Title } = Typography;
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, RefreshCcw, Plus, Search } from "lucide-react";
 
 export default function PageHeader({
   title,
@@ -19,24 +13,29 @@ export default function PageHeader({
 }) {
   return (
     <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-      <div className="flex items-center gap-2">
-        <Button type="text" icon={<LeftOutlined />} onClick={onBack} />
-        <Title level={5} className="!mb-0">
-          {title}
-        </Title>
+      <div className="flex items-center gap-3">
+        <Button variant="outline" size="icon" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
       </div>
 
       <div className="flex items-center gap-2">
-        <Input
-          placeholder="search"
-          prefix={<SearchOutlined />}
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-        />
-        <Button icon={<ReloadOutlined />} onClick={onRefresh}>
-          Refresh
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            className="pl-8"
+            placeholder="Buscar"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </div>
+        <Button variant="outline" onClick={onRefresh}>
+          <RefreshCcw className="mr-2 h-4 w-4" />
+          Refrescar
         </Button>
-        <Button type="primary" icon={<PlusOutlined />} onClick={onAdd}>
+        <Button onClick={onAdd}>
+          <Plus className="mr-2 h-4 w-4" />
           {addTitle}
         </Button>
       </div>

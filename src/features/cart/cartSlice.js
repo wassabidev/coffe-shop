@@ -11,15 +11,21 @@ export const cartSlice = createSlice({
   reducers: {
     addItem: (state, action) => {
       const { product, size } = action.payload;
+      const { _id } = product;
+
       const existingItem = state.items.find(
-        (item) => item.product._id === product._id && item.size === size,
+        (item) => item.product._id === _id && item.size === size,
       );
+
       if (existingItem) {
         existingItem.quantity += 1;
       } else {
         state.items.push({ ...action.payload, quantity: 1 });
       }
-      state = calculateTotals(state);
+
+      const { subtotal, total } = calculateTotals(state);
+      state.subtotal = subtotal;
+      state.total = total;
     },
     removeItem: (state, action) => {
       const existingItem = state.items.find(
@@ -35,7 +41,9 @@ export const cartSlice = createSlice({
           state.items.splice(index, 1);
         }
       }
-      state = calculateTotals(state);
+      const { subtotal, total } = calculateTotals(state);
+      state.subtotal = subtotal;
+      state.total = total;
     },
     clearCart: (state) => {
       state.items = [];
@@ -55,13 +63,12 @@ export default cartSlice.reducer;
 
 const calculateTotals = (state) => {
   const subtotal = state.items.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + Number(item.product.price) * item.quantity,
     0,
   );
   const total = subtotal - state.discount;
   return {
-    ...state,
-    subtotal: subtotal.toFixed(2),
-    total: total.toFixed(2),
+    subtotal: subtotal,
+    total: total,
   };
 };

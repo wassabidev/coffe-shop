@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { WhatsAppOutlined } from "@ant-design/icons";
-import { InstagramOutlined } from "@ant-design/icons";
+import { Instagram, Phone } from "lucide-react";
 
 const Footer = () => {
   const navItems = [
@@ -15,8 +14,8 @@ const Footer = () => {
           <img src="/assets/logocat.svg" alt="Logo" className="w-10" />
         </div>
         <div className="flex items-center gap-2 justify-center w-full">
-          <WhatsAppOutlined className="text-2xl" />
-          <InstagramOutlined className="text-2xl" />
+          <Instagram className="text-2xl" />
+          <Phone className="text-2xl" />
         </div>
       </div>
       <ul className="flex items-center flex-col">
