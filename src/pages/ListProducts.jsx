@@ -3,31 +3,27 @@ import ProductCard from "../components/ProductCard";
 import SideBar from "../components/SideBar";
 import Search from "../components/Search";
 import StatusView from "../components/StatusView";
-
-import axiosInstance from "./api/axiosInstance";
+import { fetchProducts } from "../hooks/products";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
 
 const ListProducts = () => {
+  const products = useSelector((state) => state.product.lista);
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
-  const fetchProducts = async () => {
-    try {
-      axiosInstance.get("/products").then((res) => setProducts(res.data));
-      setLoading(false);
-    } catch (error) {
-      setError(error);
-      console.error("Error al obtener los productos", error);
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
   const fetchCategories = async () => {
     try {
-      axiosInstance.get("/category").then((res) => setCategories(res.data));
+      const res = await axios.get("http://localhost:5001/api/category");
+      setCategories(res.data.data);
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -41,13 +37,22 @@ const ListProducts = () => {
     fetchCategories();
   }, []);
   const activeSearch = inputValue !== "" ? inputValue : searchTerm;
+  console.log("searchterm", searchTerm);
 
-  const filtered = products.filter(
-    (product) =>
-      product.name?.toLowerCase().includes(activeSearch.toLowerCase()) ||
-      product.category?.toLowerCase().includes(activeSearch.toLowerCase()) ||
-      product.type?.toLowerCase().includes(activeSearch.toLowerCase()),
-  );
+  const filtered = products.filter((product) => {
+    const nameMatch = product.name
+      ?.toLowerCase()
+      .includes(activeSearch.toLowerCase());
+
+    const subMatch = product.subcategory?.name
+      ?.toLowerCase()
+      .includes(activeSearch.toLowerCase());
+    console.log("namematch:", nameMatch, "submatch", subMatch);
+
+    return nameMatch || subMatch;
+  });
+
+  console.log("filtro:", filtered, "productos: ", products);
 
   return (
     <>
@@ -70,11 +75,9 @@ const ListProducts = () => {
               setSearchTerm={setInputValue}
               resetTerm={setSearchTerm}
             />
-            <ul className="flex gap-5 flex-wrap ">
+            <ul className="justify-center lg:justify-start flex gap-5 flex-wrap">
               {filtered.map((product) => (
-                <li key={product._id} className="cursor-pointer">
-                  <ProductCard product={product} />
-                </li>
+                <ProductCard product={product} key={product._id} />
               ))}
             </ul>
           </div>

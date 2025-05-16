@@ -63,7 +63,6 @@ export const getOrderById = async (req, res) => {
 
 export const deleteOrder = async (req, res) => {
   const { id } = req.params;
-  console.log(typeof id);
 
   try {
     const result = await Order.deleteOne({ _id: id });

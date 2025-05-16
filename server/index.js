@@ -7,6 +7,7 @@ import loginRoutes from "./routes/loginRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import subcategoryRoutes from "./routes/subcategoryRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/products", productRoutes);
 app.use("/api", loginRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/subcategory", subcategoryRoutes);
 
 app.use("/api/admin", adminRoutes);
 

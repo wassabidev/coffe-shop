@@ -20,7 +20,7 @@ export default function PageHeader({
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center flex-wrap gap-2">
         <div className="relative w-64">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input

@@ -14,6 +14,10 @@ const FavoritesSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+
+    deletedAt: {
+      type: Date,
+    },
   },
   {
     timestamps: true,
