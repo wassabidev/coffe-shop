@@ -80,7 +80,6 @@ export default function ProductModalForm({
       stock: data.stock === "true",
       imagen: previewFile ?? product.image,
     });
-    console.log("Datos a mandar:", data);
 
     reset();
     setPreview(null);

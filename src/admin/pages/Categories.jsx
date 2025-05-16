@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/pagination";
 
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import CategorieModal from "../components/forms/CategorieForm";
+import CategoryModal from "../components/forms/CategoryForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,28 +28,36 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  createCategory,
+  deleteCategory,
+  fetchCategories,
+  updateCategory,
+} from "../../hooks/categories";
 
 export default function Categories() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [currentCategory, setCurrentCategory] = useState(null);
 
-  const handleAddProduct = (newProduct) => {
-    console.log("Nuevo producto agregado", newProduct);
+  const categories = useSelector((state) => state.category.lista);
+  const loading = useSelector((state) => state.category.loading);
+  const error = useSelector((state) => state.category.error);
+  const dispatch = useDispatch();
+
+  const handleAddCategory = (newCategory) => {
+    dispatch(createCategory(newCategory));
     setIsModalOpen(false);
   };
 
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("http://localhost:5001/api/category").then(
-        (res) => res.json(),
-      );
-      setCategories(res.data);
-    } catch (err) {
-      console.error("Error al obtener las categorias", err);
-    }
+  const handleUpdateCategory = (updatedCategory) => {
+    dispatch(updateCategory({ id: currentCategory._id, ...updatedCategory }));
+    setIsModalOpen(false);
+    setCurrentCategory(null);
+    setIsUpdate(false);
   };
-
   const filteredData = categories.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase()),
   );
@@ -63,10 +71,25 @@ export default function Categories() {
     hasNextPage = true; // has a next page of results
     results.pop(); // remove extra result
   }
+  const removeItemById = (id) => {
+    dispatch(deleteCategory(id));
+  };
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    dispatch(fetchCategories());
+  }, [dispatch]);
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return (
+      <div>
+        Opps! <br />
+        Error al cargar los productos
+      </div>
+    );
+  }
 
   return (
     <>
@@ -76,7 +99,7 @@ export default function Categories() {
         searchValue={search}
         setSearchValue={setSearch}
         addTitle={"Agregar Categoria"}
-        onRefresh={() => fetchCategories()}
+        onRefresh={() => dispatch(fetchCategories())}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -84,7 +107,8 @@ export default function Categories() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Categoría</TableHead>
+              <TableHead>Categorías</TableHead>
+              <TableHead>Subategorías</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -93,6 +117,13 @@ export default function Categories() {
             {filteredData.map((row) => (
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
+                <TableCell>
+                  {row.subcategory.map((sub, i) => (
+                    <Badge key={i} className="m-1">
+                      {sub.name}
+                    </Badge>
+                  ))}
+                </TableCell>
 
                 <TableCell>{row.description}</TableCell>
                 <TableCell className="text-right">
@@ -109,13 +140,15 @@ export default function Categories() {
                         <Eye className="mr-2 h-4 w-4" /> Mostrar
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => console.log("Editar", row)}
+                        onClick={() => {
+                          setIsUpdate(true);
+                          setIsModalOpen(true);
+                          setCurrentCategory(row);
+                        }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => console.log("Eliminar", row)}
-                      >
+                      <DropdownMenuItem onClick={() => removeItemById(row._id)}>
                         <Trash2 className="mr-2 h-4 w-4 text-red-500" />
                         <span className="text-red-500">Eliminar</span>
                       </DropdownMenuItem>
@@ -144,11 +177,19 @@ export default function Categories() {
         </Pagination>
       </div>
 
-      <CategorieModal
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onSubmit={handleAddProduct}
-      />
+      {isModalOpen && isUpdate && (
+        <CategoryModal
+          open={isModalOpen}
+          isUpdate={isUpdate}
+          category={currentCategory}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setCurrentCategory(null);
+            setIsUpdate(false);
+          }}
+          onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
+        />
+      )}
     </>
   );
 }
