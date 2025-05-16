@@ -38,8 +38,9 @@ const ProductCard = ({ product }) => {
   };
 
   return (
-    <div
-      className="cursor-pointer flex flex-col gap-2 p-3 rounded-md border-[0.1rem] border-gray-200 w-3xs sm:w-2/5 md:w-2/6 shadow-md hover:shadow-lg transition-all duration-300"
+    <li
+      key={product._id}
+      className="cursor-pointer flex flex-col gap-2 p-3 rounded-md border-[0.1rem] border-gray-200 w-3xs sm:w-2/5 md:w-2/6 lg:w-52 shadow-md hover:shadow-lg transition-all duration-300"
       onClick={handleNavigate}
     >
       <div className="relative">
@@ -50,7 +51,7 @@ const ProductCard = ({ product }) => {
           style={{ viewTransitionName: `product-${product._id}` }}
         />
         <button
-          className={`absolute  cursor-pointer top-2 right-2`}
+          className={`absolute cursor-pointer top-2 right-2`}
           onClick={(event) => handleFavorite(event, product)}
         >
           <HeartICon color={isFavorited} />
@@ -60,7 +61,7 @@ const ProductCard = ({ product }) => {
         <h5>{product.name}</h5>
         <p className="font-semibold">{formatPrice(product.price)}</p>
       </div>
-    </div>
+    </li>
   );
 };
 

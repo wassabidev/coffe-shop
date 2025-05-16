@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "../components/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +9,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
 import CategorieModal from "../components/forms/CategorieForm";
 import {
@@ -19,35 +29,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
-const categories = [
-  {
-    id: 1,
-    name: "Bebidas",
-    types: ["Caliente", "Frío", "Con cafeína", "Sin cafeína"],
-    description: "Líquidos para consumir, con o sin cafeína",
-  },
-  {
-    id: 2,
-    name: "Comidas",
-    types: ["Caliente", "Vegetariano", "Sin gluten"],
-    description: "Snacks o platos simples",
-  },
-];
-
 export default function Categories() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [dataSource, setDataSource] = useState(categories);
+  const [categories, setCategories] = useState([]);
 
   const handleAddProduct = (newProduct) => {
-    const id = dataSource.length + 1;
-    setDataSource([...dataSource, { id, ...newProduct }]);
+    console.log("Nuevo producto agregado", newProduct);
     setIsModalOpen(false);
   };
 
-  const filteredData = dataSource.filter((product) =>
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/api/category").then(
+        (res) => res.json(),
+      );
+      setCategories(res.data);
+    } catch (err) {
+      console.error("Error al obtener las categorias", err);
+    }
+  };
+
+  const filteredData = categories.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  let hasNextPage = false;
+  const results = "";
+  const resultsPerPage = "";
+  const getNextPage = "";
+  if (results.length > resultsPerPage) {
+    // if got an extra result
+    hasNextPage = true; // has a next page of results
+    results.pop(); // remove extra result
+  }
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   return (
     <>
@@ -57,7 +76,7 @@ export default function Categories() {
         searchValue={search}
         setSearchValue={setSearch}
         addTitle={"Agregar Categoria"}
-        onRefresh={() => setSearch("")}
+        onRefresh={() => fetchCategories()}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -66,24 +85,15 @@ export default function Categories() {
           <TableHeader>
             <TableRow>
               <TableHead>Categoría</TableHead>
-              <TableHead>Tipos</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredData.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {row.types.map((type) => (
-                      <Badge key={type} variant="outline">
-                        {type}
-                      </Badge>
-                    ))}
-                  </div>
-                </TableCell>
+
                 <TableCell>{row.description}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -116,6 +126,22 @@ export default function Categories() {
             ))}
           </TableBody>
         </Table>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink href="#">1</PaginationLink>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext onClick={getNextPage} disable={!hasNextPage} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
 
       <CategorieModal

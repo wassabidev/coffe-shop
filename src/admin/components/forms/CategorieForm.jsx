@@ -20,6 +20,7 @@ export default function CategoryModalForm({
   const { register, handleSubmit, reset } = useForm();
 
   const handleOk = handleSubmit((data) => {
+    console.log("data", data);
     onSubmit(data);
     reset();
   });
@@ -45,6 +46,7 @@ export default function CategoryModalForm({
           <div>
             <Label htmlFor="name">Nombre</Label>
             <Input
+              className="mt-2 "
               id="name"
               {...register("name", { required: "Campo requerido" })}
             />
@@ -52,11 +54,18 @@ export default function CategoryModalForm({
 
           <div>
             <Label htmlFor="description">Descripción</Label>
-            <Textarea id="description" rows={3} {...register("description")} />
+            <Textarea
+              className="mt-2"
+              id="description"
+              rows={3}
+              {...register("description")}
+            />
           </div>
 
           <DialogFooter>
-            <Button type="submit">Guardar</Button>
+            <Button className="cursor-pointer" type="submit">
+              Guardar
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

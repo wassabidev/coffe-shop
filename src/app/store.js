@@ -5,16 +5,19 @@ import storage from "redux-persist/lib/storage";
 import cartReducer from "../features/cart/cartSlice";
 import favoriteReducer from "../features/favorites/favoriteSlice";
 import userReducer from "../features/users/userSlice";
+import ProductsReducer from "../features/products/productSlice";
 
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: ["product"],
 };
 
 const rootReducer = combineReducers({
   cart: cartReducer,
   favorites: favoriteReducer,
   user: userReducer,
+  product: ProductsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

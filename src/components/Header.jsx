@@ -131,7 +131,7 @@ const Header = () => {
               className={({ isActive }) =>
                 `flex gap-2 px-3 py-2 rounded ${
                   isActive
-                    ? "bg-blue-100 text-blue-500"
+                    ? "bg-gray-500 text-gray-100"
                     : "text-gray-700 hover:bg-gray-200"
                 }`
               }

@@ -17,8 +17,10 @@ export const createCategory = async (req, res) => {
 
 export const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
-    res.status(200).json(categories);
+    const categories = await Category.find().populate("subcategory");
+    res
+      .status(200)
+      .json({ message: "Categorias optenidas con exito", data: categories });
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });
   }
@@ -35,6 +37,31 @@ export const getCategoryById = async (req, res) => {
     res.status(200).json(category);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });
+  }
+};
+
+export const updateCategory = async (req, res) => {
+  const { id } = req.paramas;
+  const { name, description } = req.body;
+  try {
+    const category = await Category.findByIdAndUpdate(
+      id,
+      {
+        name,
+        description,
+      },
+      { updatedAt: new Date() },
+      { new: true },
+    );
+    res.status(200).json({
+      message: "Categoria actualizada",
+      data: category,
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: "Error al actualizar la categoria",
+      error: err.message,
+    });
   }
 };
 
