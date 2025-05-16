@@ -32,59 +32,49 @@ export default function Products() {
   const loading = useSelector((state) => state.product.loading);
   const error = useSelector((state) => state.product.error);
   const dispatch = useDispatch();
-  console.log("products: ", products);
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [currentProduct, setCurrentProduct] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
-
-  const handleSubmit = async (data) => {
-    const action = isUpdate
-      ? await dispatch(updateProduct({ ...data, id: selectedProduct._id }))
-      : await dispatch(createProduct(data));
+  const handleAddProduct = async (data) => {
+    dispatch(createProduct(data));
     console.log(data);
 
-    if (action.meta.requestStatus === "fulfilled") {
-      setIsModalOpen(false);
-      setIsUpdate(false);
-      setSelectedProduct(null);
-      dispatch(fetchProducts());
-      toast(
-        () => (
-          <>
-            <p>producto creado con exito</p>
-          </>
-        ),
-        {
-          icon: "✅",
-          position: "top-center",
-          duration: 2000,
-        },
-      );
-    } else {
-      toast(
-        () => (
-          <>
-            <p>Error al guardar producto</p>
-          </>
-        ),
-        {
-          icon: "❌",
-          position: "top-center",
-          duration: 2000,
-        },
-      );
-    }
+    setIsModalOpen(false);
+    setIsUpdate(false);
+    setCurrentProduct(null);
+    toast(
+      () => (
+        <>
+          <p>producto creado con exito</p>
+        </>
+      ),
+      {
+        icon: "✅",
+        position: "top-center",
+        duration: 2000,
+      },
+    );
+  };
+
+  const handleUpdateProduct = (updatedProduct) => {
+    dispatch(updateProduct({ id: currentProduct._id, ...updatedProduct }));
+    setIsModalOpen(false);
+    setCurrentProduct(null);
+    setIsUpdate(false);
   };
 
   const removeItemById = (id) => {
     dispatch(deleteProduct(id));
   };
+  const filteredData = products.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
   if (loading) {
     return <div>Cargando...</div>;
   }
@@ -97,10 +87,6 @@ export default function Products() {
       </div>
     );
   }
-
-  const filteredData = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()),
-  );
 
   return (
     <>
@@ -159,9 +145,9 @@ export default function Products() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => {
-                          setIsModalOpen(true);
                           setIsUpdate(true);
-                          setSelectedProduct(row);
+                          setIsModalOpen(true);
+                          setCurrentProduct(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -183,12 +169,12 @@ export default function Products() {
         <ProductModal
           open={isModalOpen}
           onCancel={() => {
-            setIsModalOpen(false), setSelectedProduct(null);
+            setIsModalOpen(false), setCurrentProduct(null);
             setIsUpdate(false);
           }}
-          onSubmit={handleSubmit}
+          onSubmit={isUpdate ? handleUpdateProduct : handleAddProduct}
           isUpdate={isUpdate}
-          product={selectedProduct}
+          product={currentProduct}
         />
       )}
     </>

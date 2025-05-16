@@ -6,11 +6,12 @@ import cartReducer from "../features/cart/cartSlice";
 import favoriteReducer from "../features/favorites/favoriteSlice";
 import userReducer from "../features/users/userSlice";
 import ProductsReducer from "../features/products/productSlice";
+import CategoriesReducer from "../features/categories/categorySlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["product"],
+  blacklist: ["product", "category"],
 };
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   favorites: favoriteReducer,
   user: userReducer,
   product: ProductsReducer,
+  category: CategoriesReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

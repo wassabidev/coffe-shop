@@ -1,4 +1,6 @@
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
   DialogContent,
@@ -10,14 +12,35 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 export default function CategoryModalForm({
   open,
   onCancel,
   onSubmit,
   isUpdate = false,
+  category,
 }) {
-  const { register, handleSubmit, reset } = useForm();
+  const formSchema = z.object({
+    name: z.string().trim().nonempty({ message: "Este campo es obligatorio" }),
+    description: z.string().default(""),
+  });
+
+  const {
+    formState: { errors },
+    clearErrors,
+    handleSubmit,
+    reset,
+    register,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+      subcategory: "",
+    },
+    resolver: zodResolver(formSchema),
+  });
+  console.log("categoria: ", category, "isupdate: ", isUpdate);
 
   const handleOk = handleSubmit((data) => {
     console.log("data", data);
@@ -25,6 +48,14 @@ export default function CategoryModalForm({
     reset();
   });
 
+  useEffect(() => {
+    if (isUpdate && category) {
+      reset({
+        name: category.name,
+        description: category.description,
+      });
+    }
+  }, [isUpdate, reset]);
   return (
     <Dialog
       open={open}
@@ -46,10 +77,18 @@ export default function CategoryModalForm({
           <div>
             <Label htmlFor="name">Nombre</Label>
             <Input
-              className="mt-2 "
               id="name"
               {...register("name", { required: "Campo requerido" })}
+              onChange={() => clearErrors("name")}
+              className={`${
+                errors.name
+                  ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
+                  : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
+              } mt-2 `}
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           <div>
