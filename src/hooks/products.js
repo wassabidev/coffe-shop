@@ -1,8 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { API_URL } from "@/api/api";
 
 export const fetchProducts = createAsyncThunk("products/fetch", async () => {
   try {
-    const res = await fetch("http://localhost:5001/api/products");
+    const res = await fetch(`${API_URL}/products`);
     const data = await res.json();
     return data;
   } catch (error) {
@@ -25,7 +26,7 @@ export const createProduct = createAsyncThunk(
       formData.append("image", data.imagen);
     }
 
-    const res = await fetch("http://localhost:5001/api/products", {
+    const res = await fetch(`${API_URL}/products`, {
       method: "POST",
 
       body: formData,
@@ -49,7 +50,7 @@ export const updateProduct = createAsyncThunk(
       formData.append("image", data.imagen);
     }
 
-    const res = await fetch(`http://localhost:5001/api/products/${id}`, {
+    const res = await fetch(`${API_URL}/products/${id}`, {
       method: "PUT",
       body: formData,
     });
@@ -59,7 +60,7 @@ export const updateProduct = createAsyncThunk(
 );
 
 export const deleteProduct = createAsyncThunk("products/delete", async (id) => {
-  const res = await fetch(`http://localhost:5001/api/products/${id}`, {
+  const res = await fetch(`${API_URL}/products/${id}`, {
     method: "DELETE",
   });
   return await res.json();

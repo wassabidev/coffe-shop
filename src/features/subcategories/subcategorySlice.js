@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  fetchCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
-} from "../../hooks/categories";
+  fetchsubCategories,
+  createsubCategory,
+  updatesubCategory,
+  deletesubCategory,
+} from "../../hooks/subcategories";
 
 const initialState = {
   lista: [],
@@ -15,54 +15,55 @@ const initialState = {
   pages: 1,
 };
 
-export const CategoriesSlice = createSlice({
-  name: "categories",
+export const subCategoriesSlice = createSlice({
+  name: "subcategories",
   initialState,
   reducers: {
-    addCategories: (state, action) => {
+    addSubCategories: (state, action) => {
       state.push(action.payload);
     },
   },
   extraReducers: (builder) => {
     builder
       //fetch
-      .addCase(fetchCategories.pending, (state) => {
+      .addCase(fetchsubCategories.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
+      .addCase(fetchsubCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.lista = action.payload.data.categories;
+        state.lista = action.payload.data.subcategories;
         state.total = action.payload.data.total;
         state.page = action.payload.data.page;
         state.pages = action.payload.data.pages;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
+      .addCase(fetchsubCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
 
       //create
-      .addCase(createCategory.pending, (state) => {
+      .addCase(createsubCategory.pending, (state) => {
         state.loading = true;
       })
 
-      .addCase(createCategory.fulfilled, (state, action) => {
+      .addCase(createsubCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.lista.push(action.payload.data);
       })
 
-      .addCase(createCategory.rejected, (state, action) => {
+      .addCase(createsubCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
 
       //update
-      .addCase(updateCategory.pending, (state) => {
+      .addCase(updatesubCategory.pending, (state) => {
         state.loading = true;
       })
 
-      .addCase(updateCategory.fulfilled, (state, action) => {
+      .addCase(updatesubCategory.fulfilled, (state, action) => {
         state.loading = false;
+
         const index = state.lista.findIndex(
           (t) => t._id === action.payload.data._id,
         );
@@ -70,27 +71,27 @@ export const CategoriesSlice = createSlice({
         if (index !== -1) state.lista[index] = action.payload.data;
       })
 
-      .addCase(updateCategory.rejected, (state, action) => {
+      .addCase(updatesubCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
 
       //delete
-      .addCase(deleteCategory.pending, (state) => {
+      .addCase(deletesubCategory.pending, (state) => {
         state.loading = true;
       })
-      .addCase(deleteCategory.fulfilled, (state, action) => {
+      .addCase(deletesubCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.lista = state.lista.filter(
-          (t) => t._id !== action.payload.data._id,
+          (t) => t._id !== action.payload.data.subcategories._id,
         );
       })
-      .addCase(deleteCategory.rejected, (state, action) => {
+      .addCase(deletesubCategory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
   },
 });
 
-export const { addCategories } = CategoriesSlice.actions;
-export default CategoriesSlice.reducer;
+export const { addSubCategories } = subCategoriesSlice.actions;
+export default subCategoriesSlice.reducer;

@@ -96,8 +96,8 @@ const ProductDetails = ({ product }) => {
         </div>
       </div>
       <div className="p-5 min-w-96 mx-auto">
-        <div className="grid grid-cols-1 gap-4">
-          <div className="flex flex-col gap-1 justify-start">
+        {product.category.name.toLowerCase() === "bebidas" && (
+          <div className="grid grid-cols-1 gap-4justify-start">
             <h3 className="relative font-medium text-lg text-start after:bg-green-100 after:rounded-full after:content-[''] after:w-full after:h-1.5 after:absolute after:-bottom-1 after:left-0 after:opacity-50">
               Opciones de tamaño
             </h3>
@@ -116,7 +116,7 @@ const ProductDetails = ({ product }) => {
               ))}
             </div>
           </div>
-        </div>
+        )}
         <button
           onClick={() => handleAddItem(product)}
           className="bg-emerald-700 cursor-pointer hover:bg-emerald-600 !text-white py-2 px-4 rounded-md w-full"

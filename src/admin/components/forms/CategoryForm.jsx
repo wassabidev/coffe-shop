@@ -40,12 +40,11 @@ export default function CategoryModalForm({
     },
     resolver: zodResolver(formSchema),
   });
-  console.log("categoria: ", category, "isupdate: ", isUpdate);
-
-  const handleOk = handleSubmit((data) => {
-    console.log("data", data);
-    onSubmit(data);
-    reset();
+  const handleOk = handleSubmit(async (data) => {
+    const success = await onSubmit(data);
+    if (success) {
+      reset();
+    }
   });
 
   useEffect(() => {
@@ -55,12 +54,12 @@ export default function CategoryModalForm({
         description: category.description,
       });
     }
-  }, [isUpdate, reset]);
+  }, [isUpdate, reset, category]);
   return (
     <Dialog
       open={open}
       onOpenChange={(val) => {
-        if (!val) {
+        if (!val && !errors.name) {
           onCancel();
           reset();
         }
@@ -79,7 +78,11 @@ export default function CategoryModalForm({
             <Input
               id="name"
               {...register("name", { required: "Campo requerido" })}
-              onChange={() => clearErrors("name")}
+              onChange={(e) => {
+                if (e.target.value.trim()) {
+                  clearErrors("name");
+                }
+              }}
               className={`${
                 errors.name
                   ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"

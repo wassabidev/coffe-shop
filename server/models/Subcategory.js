@@ -5,6 +5,11 @@ const SubcategorySchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
   deletedAt: {
     type: Date,
   },

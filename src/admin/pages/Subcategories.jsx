@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "../components/PageHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import ProductModal from "../components/forms/ProductForm";
+import SubcategoryModal from "../components/forms/SubcategoryForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,68 +27,55 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import toast from "react-hot-toast";
+import { useSelector, useDispatch } from "react-redux";
 import {
-  createProduct,
-  deleteProduct,
-  fetchProducts,
-  updateProduct,
-} from "../../hooks/products";
-import { useDispatch, useSelector } from "react-redux";
-import { API_URL } from "@/api/api";
+  createsubCategory,
+  deletesubCategory,
+  fetchsubCategories,
+  updatesubCategory,
+} from "../../hooks/subcategories";
 
-export default function Products() {
-  const products = useSelector((state) => state.product.lista);
-  const loading = useSelector((state) => state.product.loading);
-  const error = useSelector((state) => state.product.error);
-
-  const dispatch = useDispatch();
+export default function SubCategories() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null);
+  const [currentSubCategory, setCurrentSubCategory] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
-  const handleAddProduct = async (data) => {
-    await dispatch(createProduct(data));
-
+  const dispatch = useDispatch();
+  const subcategories = useSelector((state) => state.subcategory.lista);
+  const totalPages = useSelector((state) => state.subcategory.pages);
+  const loading = useSelector((state) => state.subcategory.loading);
+  const error = useSelector((state) => state.subcategory.error);
+  const handleAddCategory = async (newCategory) => {
+    await dispatch(createsubCategory(newCategory));
     setIsModalOpen(false);
-    setIsUpdate(false);
-    setCurrentProduct(null);
-    toast(
-      () => (
-        <>
-          <p>producto creado con exito</p>
-        </>
-      ),
-      {
-        icon: "✅",
-        position: "top-center",
-        duration: 1000,
-      },
-    );
-    await dispatch(fetchProducts());
+    await dispatch(fetchsubCategories({ page, limit }));
   };
 
-  const handleUpdateProduct = async (updatedProduct) => {
+  const handleUpdateCategory = async (updatedsubCategory) => {
     await dispatch(
-      updateProduct({ id: currentProduct._id, ...updatedProduct }),
+      updatesubCategory({ id: currentSubCategory._id, ...updatedsubCategory }),
     );
     setIsModalOpen(false);
-    setCurrentProduct(null);
+    setCurrentSubCategory(null);
     setIsUpdate(false);
-    await dispatch(fetchProducts());
+    await dispatch(fetchsubCategories({ page, limit }));
   };
 
-  const removeItemById = (id) => {
-    dispatch(deleteProduct(id));
-  };
-  const filteredData = products.filter((product) =>
+  const filteredData = subcategories.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const removeItemById = async (id) => {
+    await dispatch(deletesubCategory(id));
+    await dispatch(fetchsubCategories({ page, limit }));
+  };
+
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchsubCategories({ page, limit }));
+  }, [dispatch, page]);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -89,7 +85,7 @@ export default function Products() {
     return (
       <div>
         Opps! <br />
-        Ocurrio un error al cargar los productos
+        Error al cargar las subcategorias
       </div>
     );
   }
@@ -97,12 +93,12 @@ export default function Products() {
   return (
     <>
       <PageHeader
-        title="Lista de Productos"
+        title="Categorias List"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
-        addTitle={"Agregar Producto"}
-        onRefresh={() => dispatch(fetchProducts())}
+        addTitle={"Agregar Categoria"}
+        onRefresh={() => dispatch(fetchsubCategories({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -111,8 +107,7 @@ export default function Products() {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead>Sub categorias</TableHead>
-              <TableHead>Categoria</TableHead>
+              <TableHead>Categorías</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -122,19 +117,9 @@ export default function Products() {
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {row.subcategory ? (
-                      <Badge variant="outline">{row.subcategory.name}</Badge>
-                    ) : null}
-                  </div>
+                  <Badge>{row.category?.name}</Badge>
                 </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {row.category ? (
-                      <Badge variant="outline">{row.category.name}</Badge>
-                    ) : null}
-                  </div>
-                </TableCell>
+
                 <TableCell>{row.description}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -153,7 +138,7 @@ export default function Products() {
                         onClick={() => {
                           setIsUpdate(true);
                           setIsModalOpen(true);
-                          setCurrentProduct(row);
+                          setCurrentSubCategory(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -169,18 +154,50 @@ export default function Products() {
             ))}
           </TableBody>
         </Table>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              />
+            </PaginationItem>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  isActive={i + 1 === page}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
 
       {isModalOpen && (
-        <ProductModal
+        <SubcategoryModal
           open={isModalOpen}
+          isUpdate={isUpdate}
+          subcategory={currentSubCategory}
           onCancel={() => {
-            setIsModalOpen(false), setCurrentProduct(null);
+            setIsModalOpen(false);
+            setCurrentSubCategory(null);
             setIsUpdate(false);
           }}
-          onSubmit={isUpdate ? handleUpdateProduct : handleAddProduct}
-          isUpdate={isUpdate}
-          product={currentProduct}
+          onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
         />
       )}
     </>

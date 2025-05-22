@@ -6,7 +6,7 @@ const EyeInpunt = ({ showPassword }) => {
   return (
     <svg
       aria-hidden="true"
-      className="valign-middle h-5 w-h-5 "
+      className="valign-middle h-5 w-h-5 stroke-gray-400"
       focusable="false"
       preserveAspectRatio="xMidYMid meet"
       viewBox="0 0 24 24"

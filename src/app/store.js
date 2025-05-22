@@ -7,11 +7,12 @@ import favoriteReducer from "../features/favorites/favoriteSlice";
 import userReducer from "../features/users/userSlice";
 import ProductsReducer from "../features/products/productSlice";
 import CategoriesReducer from "../features/categories/categorySlice";
+import SubcategoriesReducer from "../features/subcategories/subCategorySlice";
 
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["product", "category"],
+  blacklist: ["product", "category", "subcategory"],
 };
 
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   product: ProductsReducer,
   category: CategoriesReducer,
+  subcategory: SubcategoriesReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

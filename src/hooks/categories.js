@@ -1,33 +1,38 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { API_URL } from "@/api/api";
 
 export const fetchCategories = createAsyncThunk(
   "categories/fetch",
-  async () => {
-    const res = await fetch("http://localhost:5001/api/category");
+  async ({ page = 1, limit = 10 }) => {
+    const res = await fetch(`${API_URL}/category?page=${page}&limit=${limit}`);
 
     return await res.json();
   },
 );
 
 export const createCategory = createAsyncThunk(
-  "categroy/create",
-  async (data) => {
-    const res = await fetch("http://localhost:5001/api/category", {
+  "category/create",
+  async (data, { rejectWithValue }) => {
+    const res = await fetch(`${API_URL}/category`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
-    return await res.json();
+    const json = await res.json();
+
+    if (!res.ok) {
+      return rejectWithValue(json.message || "Error desconocido");
+    }
+
+    return json;
   },
 );
 
 export const updateCategory = createAsyncThunk(
   "category/update",
   async ({ id, ...data }) => {
-    const res = await fetch(`http://localhost:5001/api/category/${id}`, {
+    const res = await fetch(`${API_URL}/category/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -39,9 +44,9 @@ export const updateCategory = createAsyncThunk(
   },
 );
 export const deleteCategory = createAsyncThunk(
-  "products/delete",
+  "category/delete",
   async (id) => {
-    const res = await fetch(`http://localhost:5001/api/products/${id}`, {
+    const res = await fetch(`${API_URL}/category/${id}`, {
       method: "DELETE",
     });
     return await res.json();
