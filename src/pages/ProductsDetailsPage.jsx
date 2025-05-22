@@ -3,6 +3,7 @@ import ProductDetails from "../components/ProductDetails";
 import { useParams } from "react-router-dom";
 import Loading from "@/components/ui/Loading";
 import axios from "axios";
+import { API_URL } from "@/api/api";
 
 const ProductsDetailsPage = () => {
   const { id } = useParams();
@@ -13,9 +14,7 @@ const ProductsDetailsPage = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(
-          `http://localhost:5001/api/products/${id}`,
-        );
+        const response = await axios.get(`${API_URL}/products/${id}`);
         setProduct(response.data.data);
         setLoading(false);
       } catch (error) {

@@ -1,9 +1,10 @@
 import axios from "axios";
 import { store } from "../../app/store";
 import { setUser, logout } from "../../features/users/userSlice";
+import { API_URL } from "@/api/api";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: `${API_URL}`,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -32,7 +33,7 @@ axiosInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const res = await axios.post("http://localhost:5001/api/refresh", {
+        const res = await axios.post(`${API_URL}/refresh`, {
           refreshToken,
         });
 

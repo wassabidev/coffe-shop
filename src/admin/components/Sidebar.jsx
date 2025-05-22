@@ -22,14 +22,14 @@ const navItems = [
     icon: <LayoutGrid className="w-4 h-4" />,
   },
   {
+    label: "Subcategorias",
+    path: "/admin/subcategories",
+    icon: <PackageSearch className="w-4 h-4" />,
+  },
+  {
     label: "Usuarios",
     path: "/admin/users",
     icon: <User className="w-4 h-4" />,
-  },
-  {
-    label: "Tipos",
-    path: "/admin/types",
-    icon: <PackageSearch className="w-4 h-4" />,
   },
 ];
 
@@ -45,7 +45,7 @@ export default function Sidebar() {
           className={({ isActive }) =>
             `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
               isActive
-                ? "bg-blue-100 text-blue-600"
+                ? "bg-gray-100 text-gray-600"
                 : "text-gray-700 hover:bg-gray-100"
             }`
           }

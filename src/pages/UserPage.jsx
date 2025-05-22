@@ -3,17 +3,27 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { formatDate } from "@/utils/date";
+import { API_URL } from "@/api/api";
 
 const UserPage = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { user: userData } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
+  console.log(isAuthenticated);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (!userData?._id) return;
+
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5001/api/order/user/${userData._id}`,
+          `${API_URL}/order/user/${userData._id}`,
         );
         setOrders(response.data);
       } catch (error) {
@@ -21,19 +31,17 @@ const UserPage = ({ isAuthenticated }) => {
       }
     };
     fetchOrders();
-  }, [userData._id]);
+  }, [userData?._id]);
 
-  if (!isAuthenticated) {
-    return navigate("/");
-  }
+  if (!isAuthenticated) return null;
 
   return (
     //a mejorar, usar tablas
     <div>
-      {userData.name} <br />
-      {userData.email}
+      {userData?.name} <br />
+      {userData?.email}
       <br />
-      {userData.rol}
+      {userData?.rol}
       <div className="mt-3">
         {orders && orders.length > 0 ? (
           <div>

@@ -8,9 +8,16 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
+import EyeInpunt from "../components/ui/EyeInpunt";
+import { useState } from "react";
+import { API_URL } from "@/api/api";
 
 const LoginPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -39,7 +46,8 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:5001/api/login", {
+      setLoading(true);
+      const response = await axios.post(`${API_URL}/login`, {
         email: data.email,
         password: data.password,
       });
@@ -47,20 +55,26 @@ const LoginPage = () => {
       const user = response.data.user;
       const refreshToken = response.data.refreshToken;
       dispatch(setUser({ token, user, refreshToken }));
+      setTimeout(() => {
+        setLoading(false);
+      }, "800");
       navigate("/");
     } catch (error) {
       //esto  cambiar por un div en la parte superior
       // del form
-      console.error(
-        "error al iniciar sesión",
-        error.response?.data?.mensaje || error.message,
-      );
-      toast.error(error.response?.data?.mensaje || "Error al iniciar sesión");
+      setError(error.response?.data?.mensaje || "Error al iniciar sesión");
     }
   };
 
   return (
     <div className="flex h-dvh w-full">
+      {loading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        </div>
+      )}
       <Toaster />
       <div className="bg-[#FFC671] bg-opacity-50 hidden md:flex items-center justify-center w-1/2">
         <img src="/assets/michi.svg" className="w-2xs" alt="" />
@@ -81,6 +95,9 @@ const LoginPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-3"
           >
+            <div className="border-red-500 bg-red-200 p-3 rounded-md">
+              {error}
+            </div>
             <div>
               <label htmlFor="email">Correo</label>
               <input
@@ -100,21 +117,30 @@ const LoginPage = () => {
 
             <div>
               <label htmlFor="password">Contraseña</label>
-              <input
-                type="password"
-                {...register("password")}
-                onChange={() => clearErrors("email")}
-                className={`${
-                  errors.password
-                    ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
-                    : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
-                } !mt-2  text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-sm">
-                  {errors.password.message}
-                </p>
-              )}
+              <div className="relative">
+                <input
+                  type="password"
+                  autoComplete="current-password"
+                  {...register("password")}
+                  onChange={() => clearErrors("email")}
+                  className={`${
+                    errors.password
+                      ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
+                      : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
+                  } !mt-2  text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
+                />
+                <button
+                  className="cursor-pointer bg-transparent absolute right-2 top-5 -translate-y-1/2"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <EyeInpunt showPassword={showPassword} />
+                </button>
+                {errors.password && (
+                  <p className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
             </div>
             <div className="py-4 flex justify-end">
               <Link className="text-blue-400 underline">

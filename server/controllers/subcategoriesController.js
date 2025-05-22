@@ -1,11 +1,13 @@
 import Subcategory from "../models/Subcategory.js";
+import Category from "../models/Category.js";
 
 export const createSubcategory = async (req, res) => {
   try {
+    console.log(req.body);
     const { name, description, category } = req.body;
     const subcategoryExist = await Subcategory.exists({ name });
     if (subcategoryExist) {
-      return res.status(400).json({ message: "Tipo ya existe" });
+      return res.status(400).json({ message: "Subcategoria ya existe" });
     }
     const subcategory = new Subcategory({
       name,
@@ -13,34 +15,50 @@ export const createSubcategory = async (req, res) => {
       description,
     });
     await subcategory.save();
+    await Category.findByIdAndUpdate(category, {
+      $addToSet: { subcategory: subcategory._id },
+    });
     res
       .status(201)
       .json({ data: subcategory, message: "Subcategoria creada con exito" });
   } catch (error) {
     console.log("Error al crear nuevo tipo:", error);
-    res
-      .status(400)
-      .json({ message: "Error al crear nuevo tipo.", error: error.message });
-  }
-};
-
-export const getCategories = async (req, res) => {
-  try {
-    const subcategories = await Subcategory.find({
-      deletedAt: { $exists: false },
-    }).populate("category");
-    res
-      .status(200)
-      .json({ data: subcategories, message: "subcategorias encontradas" });
-  } catch (error) {
-    res.status(500).json({
-      message: "Error al obtener los productos",
+    res.status(400).json({
+      message: "Error al crear uan nueva subcategoria.",
       error: error.message,
     });
   }
 };
 
-export const getCategoriesById = async (req, res) => {
+export const getsubCategories = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  try {
+    const skip = (page - 1) * limit;
+    const subcategories = await Subcategory.find({
+      deletedAt: { $exists: false },
+    })
+      .populate("category")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    const total = await Subcategory.countDocuments();
+    res.status(200).json({
+      data: {
+        subcategories,
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+      },
+      message: "Subcategorias optenidas con exito",
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error al obtener las subcategorias", error });
+  }
+};
+
+export const getsubCategoryById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -54,49 +72,63 @@ export const getCategoriesById = async (req, res) => {
   }
 };
 
-export const updateCategories = async (req, res) => {
-  const { id } = req.paramas;
-  const { name, description } = req.body;
+export const updatesubCategory = async (req, res) => {
+  const { id } = req.params;
   try {
-    const category = await Subcategory.findByIdAndUpdate(
+    const oldSub = await Subcategory.findById(id);
+    const oldCategoryId = oldSub?.category?.toString();
+    const newCategoryId = req.body.category;
+    const subcategory = await Subcategory.findByIdAndUpdate(
       id,
       {
-        name,
-        description,
+        ...req.body,
+        updatedAt: new Date(),
       },
-      { updatedAt: new Date() },
       { new: true },
     );
+    //si se cambia de categoria, elimina de subcategoria de la anterorir categoria
+    if (oldCategoryId && oldCategoryId !== newCategoryId) {
+      await Category.findByIdAndUpdate(oldCategoryId, {
+        $pull: { subcategory: subcategory._id },
+      });
+    }
+
+    await Category.findByIdAndUpdate(subcategory.category, {
+      $addToSet: { subcategory: subcategory._id },
+    });
     res.status(200).json({
       message: "Categoria actualizada",
-      data: category,
+      data: subcategory,
     });
   } catch (err) {
     res.status(400).json({
-      message: "Error al actualizar la categoria",
+      message: "Error al actualizar la subcategoria",
       error: err.message,
     });
   }
 };
 
-export const deleteCategory = async (req, res) => {
+export const deletesubCategory = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await Subcategory.findByIdAndUpdate(
+    const subcategory = await Subcategory.findByIdAndUpdate(
       id,
       { deletedAt: new Date() },
       { new: true },
     );
-    console.log("Resultado de deleteOne:", result);
-    if (result.deletedCount === 0) {
-      return res.status(404).json({ message: "Tipo no encontrado" });
+    if (!subcategory) {
+      return res.status(404).json({ message: "Subcategoria no encontrado" });
     }
-
-    res.status(200).json({ message: "Categoria eliminado" });
+    if (subcategory.category) {
+      await Category.findByIdAndUpdate(subcategory.category, {
+        $pull: { subcategory: subcategory._id },
+      });
+    }
+    res.status(200).json({ message: "Subategoria eliminado" });
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error al intentar eliminar el categoria", error });
+      .json({ message: "Error al intentar eliminar la subcategoria", error });
   }
 };

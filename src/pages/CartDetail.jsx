@@ -26,7 +26,6 @@ const CartDetail = () => {
   const handleDelete = (event, item) => {
     event.stopPropagation();
     dispatch(removeItem(item));
-    console.log(item._id);
   };
 
   const handleSubmit = async (e) => {

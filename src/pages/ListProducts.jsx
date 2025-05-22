@@ -6,6 +6,7 @@ import StatusView from "../components/StatusView";
 import { fetchProducts } from "../hooks/products";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { API_URL } from "@/api/api";
 
 const ListProducts = () => {
   const products = useSelector((state) => state.product.lista);
@@ -22,12 +23,11 @@ const ListProducts = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:5001/api/category");
+      const res = await axios.get(`${API_URL}/category`);
       setCategories(res.data.data);
       setLoading(false);
     } catch (error) {
       setError(error);
-      console.error("Error al obtener los productos", error);
       setLoading(false);
     }
   };
@@ -37,7 +37,6 @@ const ListProducts = () => {
     fetchCategories();
   }, []);
   const activeSearch = inputValue !== "" ? inputValue : searchTerm;
-  console.log("searchterm", searchTerm);
 
   const filtered = products.filter((product) => {
     const nameMatch = product.name
@@ -47,12 +46,9 @@ const ListProducts = () => {
     const subMatch = product.subcategory?.name
       ?.toLowerCase()
       .includes(activeSearch.toLowerCase());
-    console.log("namematch:", nameMatch, "submatch", subMatch);
 
     return nameMatch || subMatch;
   });
-
-  console.log("filtro:", filtered, "productos: ", products);
 
   return (
     <>

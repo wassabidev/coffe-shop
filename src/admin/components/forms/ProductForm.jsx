@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+
 import {
   Select,
   SelectItem,
@@ -18,6 +19,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { API_URL } from "@/api/api";
 
 export default function ProductModalForm({
   open,
@@ -39,7 +41,7 @@ export default function ProductModalForm({
       .string()
       .trim()
       .nonempty({ message: "Elija una subcategoria" }),
-    price: z.coerce.string().min(1, { message: "Este campo es requerido" }),
+    price: z.coerce.string().min(3, { message: "Este campo es requerido" }),
     stock: z.enum(["true", "false"]),
     image: z
       .union([z.instanceof(File), z.string()])
@@ -52,7 +54,6 @@ export default function ProductModalForm({
         },
       ),
   });
-
   const {
     formState: { errors },
     clearErrors,
@@ -67,7 +68,7 @@ export default function ProductModalForm({
       name: "",
       category: "",
       subcategory: "",
-      price: "0",
+      price: "",
       description: "",
       stock: true,
     },
@@ -107,11 +108,11 @@ export default function ProductModalForm({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/category");
+        const res = await fetch(`${API_URL}/category?all=true`);
         const data = await res.json();
-        setCategories(data.data);
+        setCategories(data.data.categories);
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching categories:", error.message);
       }
     };
 
@@ -279,6 +280,7 @@ export default function ProductModalForm({
             <Label className="mb-2">Precio</Label>
             <Input
               type="text"
+              placeholder="0"
               {...register("price", { required: true })}
               onChange={() => clearErrors("price")}
               className={`${

@@ -1,8 +1,6 @@
 import { formatPrice } from "@/utils/price";
 import { formatDate } from "@/utils/date";
 const Modal = ({ setShowModal, order }) => {
-  console.log(order);
-
   return (
     <div
       onClick={() => setShowModal(false)}

@@ -12,7 +12,6 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
+import toast, { Toaster } from "react-hot-toast";
 import {
   createCategory,
   deleteCategory,
@@ -41,65 +41,63 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [currentCategory, setCurrentCategory] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
-  const categories = useSelector((state) => state.category.lista);
-  const loading = useSelector((state) => state.category.loading);
-  const error = useSelector((state) => state.category.error);
   const dispatch = useDispatch();
+  const categories = useSelector((state) => state.category.lista);
+  const totalPages = useSelector((state) => state.category.pages);
+  const loading = useSelector((state) => state.category.loading);
+  //const error = useSelector((state) => state.category.error);
 
-  const handleAddCategory = (newCategory) => {
-    dispatch(createCategory(newCategory));
-    setIsModalOpen(false);
+  const handleAddCategory = async (newCategory) => {
+    try {
+      await dispatch(createCategory(newCategory)).unwrap();
+      setIsModalOpen(false);
+      return true;
+    } catch (err) {
+      toast.error(`${err}`, {
+        position: "top-center",
+      });
+      return false;
+    }
   };
 
-  const handleUpdateCategory = (updatedCategory) => {
+  const handleUpdateCategory = async (updatedCategory) => {
     dispatch(updateCategory({ id: currentCategory._id, ...updatedCategory }));
     setIsModalOpen(false);
     setCurrentCategory(null);
     setIsUpdate(false);
+    await dispatch(fetchCategories({ page, limit }));
   };
+
   const filteredData = categories.filter((product) =>
     product.name.toLowerCase().includes(search.toLowerCase()),
   );
 
-  let hasNextPage = false;
-  const results = "";
-  const resultsPerPage = "";
-  const getNextPage = "";
-  if (results.length > resultsPerPage) {
-    // if got an extra result
-    hasNextPage = true; // has a next page of results
-    results.pop(); // remove extra result
-  }
-  const removeItemById = (id) => {
+  const removeItemById = async (id) => {
     dispatch(deleteCategory(id));
+    await dispatch(fetchCategories({ page, limit }));
   };
 
   useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
+    dispatch(fetchCategories({ page, limit }));
+  }, [dispatch, page]);
+
   if (loading) {
     return <div>Cargando...</div>;
   }
 
-  if (error) {
-    return (
-      <div>
-        Opps! <br />
-        Error al cargar los productos
-      </div>
-    );
-  }
-
   return (
     <>
+      <Toaster />
       <PageHeader
         title="Categorias List"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
         addTitle={"Agregar Categoria"}
-        onRefresh={() => dispatch(fetchCategories())}
+        onRefresh={() => dispatch(fetchCategories({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -162,22 +160,37 @@ export default function Categories() {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href="#" />
+              <PaginationPrevious
+                href="#"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              />
             </PaginationItem>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  isActive={i + 1 === page}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
             <PaginationItem>
-              <PaginationLink href="#">1</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext onClick={getNextPage} disable={!hasNextPage} />
+              <PaginationNext
+                href="#"
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
       </div>
 
-      {isModalOpen && isUpdate && (
+      {isModalOpen && (
         <CategoryModal
           open={isModalOpen}
           isUpdate={isUpdate}
