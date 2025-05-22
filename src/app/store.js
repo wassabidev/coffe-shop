@@ -7,7 +7,7 @@ import favoriteReducer from "../features/favorites/favoriteSlice";
 import userReducer from "../features/users/userSlice";
 import ProductsReducer from "../features/products/productSlice";
 import CategoriesReducer from "../features/categories/categorySlice";
-import SubcategoriesReducer from "../features/subcategories/subCategorySlice";
+import SubcategoriesReducer from "../features/subcategories/subcategorySlice";
 
 const persistConfig = {
   key: "root",
