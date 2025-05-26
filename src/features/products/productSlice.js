@@ -24,6 +24,7 @@ export const ProductsSlice = createSlice({
     builder
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;

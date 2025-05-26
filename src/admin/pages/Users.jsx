@@ -48,7 +48,6 @@ export default function Categories() {
   const categories = useSelector((state) => state.category.lista);
   const totalPages = useSelector((state) => state.category.pages);
   const loading = useSelector((state) => state.category.loading);
-  //const error = useSelector((state) => state.category.error);
 
   const handleAddCategory = async (newCategory) => {
     try {
@@ -64,7 +63,9 @@ export default function Categories() {
   };
 
   const handleUpdateCategory = async (updatedCategory) => {
-    dispatch(updateCategory({ id: currentCategory._id, ...updatedCategory }));
+    await dispatch(
+      updateCategory({ id: currentCategory._id, ...updatedCategory }),
+    );
     setIsModalOpen(false);
     setCurrentCategory(null);
     setIsUpdate(false);
