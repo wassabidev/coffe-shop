@@ -9,13 +9,17 @@ import axiosInstance from "./api/axiosInstance";
 import toast, { Toaster } from "react-hot-toast";
 import Modal from "@/components/ui/Modal";
 import { Link } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 const CartDetail = () => {
   const [showModal, setShowModal] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [lastOrder, setLastOrder] = useState(null);
+
   const { items: cartItems, total } = useSelector((store) => store.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { isAuthenticated } = useSelector((state) => state.user);
 
   const handleAdd = (event, item) => {
@@ -30,6 +34,7 @@ const CartDetail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     if (!isAuthenticated) {
       toast.error("Debes iniciar sesión para confirmar la compra", {
         position: "top-center",
@@ -44,12 +49,16 @@ const CartDetail = () => {
       setLastOrder(res.data);
       setShowModal(true);
       dispatch(clearCart());
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
     } catch (error) {
+      setIsLoading(false);
       console.error(
         "error al confirmar la orden",
         error.response?.data?.mensaje || error.message,
       );
-      toast.error(`Error al crear la orden ${error}`, {
+      toast.error(`Opps! Hubo un error al crear la orden`, {
         position: "top-center",
       });
     }
@@ -58,6 +67,13 @@ const CartDetail = () => {
   return (
     <div className="md:max-w-4/5 w-full md:mx-auto">
       <Toaster />
+      {isLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        </div>
+      )}
       {showModal && lastOrder && (
         <Modal order={lastOrder} setShowModal={setShowModal} />
       )}

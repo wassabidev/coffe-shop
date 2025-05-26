@@ -17,7 +17,7 @@ app.use(
   cors({
     origin: "*", // o dominio de Vercel
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
   }),
 );
 connectDB();

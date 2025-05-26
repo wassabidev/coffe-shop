@@ -9,7 +9,10 @@ import {
 const initialState = {
   lista: [],
   loading: false,
-  error: null,
+  fetch: null,
+  createError: null,
+  updateError: null,
+  deleteError: null,
   total: 0,
   page: 1,
   pages: 1,
@@ -28,6 +31,7 @@ export const subCategoriesSlice = createSlice({
       //fetch
       .addCase(fetchsubCategories.pending, (state) => {
         state.loading = true;
+        state.fetchError = null;
       })
       .addCase(fetchsubCategories.fulfilled, (state, action) => {
         state.loading = false;
@@ -38,12 +42,13 @@ export const subCategoriesSlice = createSlice({
       })
       .addCase(fetchsubCategories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.fetchError = action.payload?.message || action.error.message;
       })
 
       //create
       .addCase(createsubCategory.pending, (state) => {
         state.loading = true;
+        state.createError = null;
       })
 
       .addCase(createsubCategory.fulfilled, (state, action) => {
@@ -53,12 +58,13 @@ export const subCategoriesSlice = createSlice({
 
       .addCase(createsubCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.createError = action.payload?.message || action.error.message;
       })
 
       //update
       .addCase(updatesubCategory.pending, (state) => {
         state.loading = true;
+        state.updateError = null;
       })
 
       .addCase(updatesubCategory.fulfilled, (state, action) => {
@@ -73,22 +79,23 @@ export const subCategoriesSlice = createSlice({
 
       .addCase(updatesubCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.updateError = action.payload?.message || action.error.message;
       })
 
       //delete
       .addCase(deletesubCategory.pending, (state) => {
         state.loading = true;
+        state.deleteError = null;
       })
       .addCase(deletesubCategory.fulfilled, (state, action) => {
         state.loading = false;
         state.lista = state.lista.filter(
-          (t) => t._id !== action.payload.data.subcategories._id,
+          (t) => t._id !== action.payload.data._id,
         );
       })
       .addCase(deletesubCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.deleteError = action.payload?.message || action.error.message;
       });
   },
 });

@@ -3,7 +3,6 @@ import Category from "../models/Category.js";
 
 export const createSubcategory = async (req, res) => {
   try {
-    console.log(req.body);
     const { name, description, category } = req.body;
     const subcategoryExist = await Subcategory.exists({ name });
     if (subcategoryExist) {
@@ -76,6 +75,13 @@ export const updatesubCategory = async (req, res) => {
   const { id } = req.params;
   try {
     const oldSub = await Subcategory.findById(id);
+    const subcategoryExist = await Subcategory.findOne({
+      name: req.body.name,
+      _id: { $ne: id },
+    });
+    if (subcategoryExist) {
+      return res.status(400).json({ message: "Subcategoria ya existe" });
+    }
     const oldCategoryId = oldSub?.category?.toString();
     const newCategoryId = req.body.category;
     const subcategory = await Subcategory.findByIdAndUpdate(
@@ -125,7 +131,9 @@ export const deletesubCategory = async (req, res) => {
         $pull: { subcategory: subcategory._id },
       });
     }
-    res.status(200).json({ message: "Subategoria eliminado" });
+    res
+      .status(200)
+      .json({ data: subcategory, message: "Subategoria eliminado" });
   } catch (error) {
     res
       .status(500)

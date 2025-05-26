@@ -40,7 +40,7 @@ export default function SubCategoryModalForm({
 
   const {
     formState: { errors },
-    clearErrors,
+    trigger,
     handleSubmit,
     control,
     reset,
@@ -106,7 +106,10 @@ export default function SubCategoryModalForm({
             <Input
               id="name"
               {...register("name", { required: "Campo requerido" })}
-              onChange={() => clearErrors("name")}
+              onChange={(e) => {
+                register("name").onChange(e);
+                trigger("name");
+              }}
               className={`${
                 errors.name
                   ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"

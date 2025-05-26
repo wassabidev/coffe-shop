@@ -15,13 +15,13 @@ const Modal = ({ setShowModal, order }) => {
         <h2 className="text-center text-xl font-bold">Orden existosa!</h2>
         <hr className="my-4 border-t border-gray-200" />
         <div className="bg-gray-100 rounded-lg grid">
-          <div className="grid-cols-2  grid gap-4 p-4">
-            <p>Fecha y hora</p>
-            <p className="text-right">{formatDate(order.createdAt)}</p>
-            <p>id de orden</p>
-            <p className="text-right">{order._id}</p>
-            <p>total</p>
-            <p className="text-right">{formatPrice(order.total)}</p>
+          <div className="grid-cols-1 md:grid-cols-2 grid md:gap-y-4 p-4">
+            <p className="font-medium">Fecha y hora: </p>
+            <p className="md:text-right">{formatDate(order.createdAt)}</p>
+            <p className="font-medium mt-2 md:mt-0">Id de orden:</p>
+            <p className="md:text-right">{order._id}</p>
+            <p className="font-medium mt-2 md:mt-0">Total:</p>
+            <p className="md:text-right">{formatPrice(order.total)}</p>
           </div>
           <div></div>
         </div>

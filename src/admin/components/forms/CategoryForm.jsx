@@ -22,13 +22,13 @@ export default function CategoryModalForm({
   category,
 }) {
   const formSchema = z.object({
-    name: z.string().trim().nonempty({ message: "Este campo es obligatorio" }),
+    name: z.string().trim().nonempty({ message: "Esta campo es obligatorio" }),
     description: z.string().default(""),
   });
 
   const {
     formState: { errors },
-    clearErrors,
+    trigger,
     handleSubmit,
     reset,
     register,
@@ -56,15 +56,7 @@ export default function CategoryModalForm({
     }
   }, [isUpdate, reset, category]);
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(val) => {
-        if (!val && !errors.name) {
-          onCancel();
-          reset();
-        }
-      }}
-    >
+    <Dialog open={open} onOpenChange={(val) => !val && onCancel()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
@@ -76,18 +68,16 @@ export default function CategoryModalForm({
           <div>
             <Label htmlFor="name">Nombre</Label>
             <Input
-              id="name"
-              {...register("name", { required: "Campo requerido" })}
+              {...register("name", { required: true })}
               onChange={(e) => {
-                if (e.target.value.trim()) {
-                  clearErrors("name");
-                }
+                register("name").onChange(e);
+                trigger("name");
               }}
               className={`${
                 errors.name
                   ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
                   : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
-              } mt-2 `}
+              } !mt-2 text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
             />
             {errors.name && (
               <p className="text-red-500 text-sm">{errors.name.message}</p>

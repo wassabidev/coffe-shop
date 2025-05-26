@@ -35,7 +35,26 @@ export const createUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find({
+      deactivatedAt: { $exists: false },
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener los productos", error });
+  }
+};
+export const deleteUser = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const users = await User.findOneAndUpdate(
+      id,
+      { deactivatedAt: new Date() },
+      { new: true },
+    );
+    if (!users) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });

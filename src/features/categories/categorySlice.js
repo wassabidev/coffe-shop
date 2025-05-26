@@ -28,6 +28,7 @@ export const CategoriesSlice = createSlice({
       //fetch
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
