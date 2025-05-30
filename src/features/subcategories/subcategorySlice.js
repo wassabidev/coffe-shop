@@ -9,7 +9,7 @@ import {
 const initialState = {
   lista: [],
   loading: false,
-  fetch: null,
+  fetchError: null,
   createError: null,
   updateError: null,
   deleteError: null,

@@ -9,7 +9,13 @@ import {
 const initialState = {
   lista: [],
   loading: false,
-  error: null,
+  fetchError: null,
+  createError: null,
+  updateError: null,
+  deleteError: null,
+  total: 0,
+  page: 1,
+  pages: 1,
 };
 
 export const ProductsSlice = createSlice({
@@ -22,17 +28,21 @@ export const ProductsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      //fetch
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.fetchError = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.lista = action.payload.data;
+        state.lista = action.payload.data.products;
+        state.total = action.payload.data.total;
+        state.page = action.payload.data.page;
+        state.pages = action.payload.data.pages;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.fetchError = action.payload?.message || action.error.message;
       })
 
       //create
@@ -47,7 +57,7 @@ export const ProductsSlice = createSlice({
 
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.createError = action.payload?.message || action.error.message;
       })
 
       //update
@@ -66,7 +76,7 @@ export const ProductsSlice = createSlice({
 
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.updateError = action.payload?.message || action.error.message;
       })
 
       //delete
@@ -81,7 +91,7 @@ export const ProductsSlice = createSlice({
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.deleteError = action.payload?.message || action.error.message;
       });
   },
 });

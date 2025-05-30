@@ -26,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -49,9 +50,6 @@ export default function SubCategories() {
   const loading = useSelector((state) => state.subcategory.loading);
   const fetchError = useSelector((state) => state.subcategory.fetchError);
 
-  const deleteError = useSelector((state) => state.subcategory.deleteError);
-  const updateError = useSelector((state) => state.subcategory.updateError);
-
   const handleAddCategory = async (newCategory) => {
     const result = await dispatch(createsubCategory(newCategory));
     if (createsubCategory.rejected.match(result)) {
@@ -61,13 +59,15 @@ export default function SubCategories() {
         position: "top-center",
         duration: 3000,
       });
-      return false;
     } else {
       await dispatch(fetchsubCategories({ page, limit }));
+      toast.success(`Subcategoria creada con exito!}`, {
+        position: "top-center",
+        duration: 3000,
+      });
       setIsModalOpen(false);
       setCurrentSubCategory(null);
       setIsUpdate(false);
-      return true;
     }
   };
 
@@ -84,10 +84,10 @@ export default function SubCategories() {
       });
     } else {
       await dispatch(fetchsubCategories({ page, limit }));
+      setIsModalOpen(false);
+      setCurrentSubCategory(null);
+      setIsUpdate(false);
     }
-    setIsModalOpen(false);
-    setCurrentSubCategory(null);
-    setIsUpdate(false);
   };
 
   const filteredData = Array.isArray(subcategories)
@@ -97,8 +97,22 @@ export default function SubCategories() {
     : [];
 
   const removeItemById = async (id) => {
-    await dispatch(deletesubCategory(id));
-    await dispatch(fetchsubCategories({ page, limit }));
+    const result = await dispatch(deletesubCategory(id));
+
+    if (deletesubCategory.rejected.match(result)) {
+      const message =
+        result.payload?.message || result.error?.message || "Ocurrió un error";
+      toast.error(`Error al eliminar subcategoría: ${message}`, {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      toast.success("Subcategoría eliminada correctamente", {
+        position: "top-center",
+        duration: 2000,
+      });
+      await dispatch(fetchsubCategories({ page, limit }));
+    }
   };
 
   useEffect(() => {
@@ -106,7 +120,13 @@ export default function SubCategories() {
   }, [dispatch, page]);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      </div>
+    );
   }
 
   if (fetchError) {
@@ -122,7 +142,7 @@ export default function SubCategories() {
   }
 
   return (
-    <>
+    <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
         title="Sub Categorias List"
@@ -219,17 +239,19 @@ export default function SubCategories() {
         </Pagination>
       </div>
 
-      <SubcategoryModal
-        open={isModalOpen}
-        isUpdate={isUpdate}
-        subcategory={currentSubCategory}
-        onCancel={() => {
-          setIsModalOpen(false);
-          setCurrentSubCategory(null);
-          setIsUpdate(false);
-        }}
-        onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
-      />
-    </>
+      {isModalOpen && (
+        <SubcategoryModal
+          open={isModalOpen}
+          isUpdate={isUpdate}
+          subcategory={currentSubCategory}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setCurrentSubCategory(null);
+            setIsUpdate(false);
+          }}
+          onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
+        />
+      )}
+    </div>
   );
 }

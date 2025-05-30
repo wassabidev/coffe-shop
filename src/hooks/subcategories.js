@@ -63,23 +63,23 @@ export const updatesubCategory = createAsyncThunk(
     }
   },
 );
+
 export const deletesubCategory = createAsyncThunk(
   "subcategory/delete",
-  async (id) => {
+  async (id, { rejectWithValue }) => {
     try {
       const res = await fetch(`${API_URL}/subcategory/${id}`, {
         method: "DELETE",
       });
       const json = await res.json();
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Error al eliminar subcategoría");
+        return rejectWithValue(json);
       }
       return json;
     } catch (err) {
-      return {
+      return rejectWithValue({
         message: "Error de red al eliminar subcategoría",
-      };
+      });
     }
   },
 );

@@ -3,6 +3,10 @@ import Category from "../models/Category.js";
 export const createCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
+    const categoryExist = await Category.exists({ name });
+    if (categoryExist) {
+      return res.status(400).json({ message: "La categoria ya existe" });
+    }
     const category = new Category({
       name,
       description,
@@ -39,7 +43,9 @@ export const getCategories = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-    const total = await Category.countDocuments();
+    const total = await Category.countDocuments({
+      deletedAt: { $exists: false },
+    });
     res.status(200).json({
       data: {
         categories: categories,
@@ -72,6 +78,10 @@ export const updateCategory = async (req, res) => {
   const { id } = req.params;
   const { name, description } = req.body;
   try {
+    const categoryExist = await Category.exists({ name });
+    if (categoryExist) {
+      return res.status(400).json({ message: "La categoria ya existe" });
+    }
     const category = await Category.findByIdAndUpdate(
       id,
       {
@@ -103,7 +113,7 @@ export const deleteCategory = async (req, res) => {
       { new: true },
     );
     if (!result) {
-      return res.status(400).json({ message: "Categoria no encontrado" });
+      return res.status(400).json({ message: "Categoria no encontrada" });
     }
     res.status(200).json({ data: result, message: "Categoria eliminado" });
   } catch (error) {

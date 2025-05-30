@@ -17,6 +17,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Loader2 } from "lucide-react";
 
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
 import CategoryModal from "../components/forms/CategoryForm";
@@ -48,7 +49,7 @@ export default function Categories() {
   const categories = useSelector((state) => state.category.lista);
   const totalPages = useSelector((state) => state.category.pages);
   const loading = useSelector((state) => state.category.loading);
-  //const error = useSelector((state) => state.category.error);
+  const error = useSelector((state) => state.category.error);
 
   const handleAddCategory = async (newCategory) => {
     try {
@@ -64,11 +65,26 @@ export default function Categories() {
   };
 
   const handleUpdateCategory = async (updatedCategory) => {
-    dispatch(updateCategory({ id: currentCategory._id, ...updatedCategory }));
-    setIsModalOpen(false);
-    setCurrentCategory(null);
-    setIsUpdate(false);
-    await dispatch(fetchCategories({ page, limit }));
+    const result = await dispatch(
+      updateCategory({ id: currentCategory._id, ...updatedCategory }),
+    );
+    if (updateCategory.rejected.match(result)) {
+      const message =
+        result.payload?.message || result.error?.message || "Ocurrió un error";
+      toast.error(`Error al actualizar categoria: ${message}`, {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      await dispatch(fetchCategories({ page, limit }));
+      toast.success(`Categoria actualizada con exito!`, {
+        position: "top-center",
+        duration: 3000,
+      });
+      setIsModalOpen(false);
+      setCurrentCategory(null);
+      setIsUpdate(false);
+    }
   };
 
   const filteredData = categories.filter((product) =>
@@ -85,11 +101,25 @@ export default function Categories() {
   }, [dispatch, page]);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div>
+        Opps! <br />
+        Ocurrio un error al cargar las categoria
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
         title="Categorias List"
@@ -203,6 +233,6 @@ export default function Categories() {
           onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -66,6 +66,12 @@ export default function SubCategoryModalForm({
         category: subcategory.category?._id,
         description: subcategory.description,
       });
+    } else {
+      reset({
+        name: "",
+        category: "",
+        description: "",
+      });
     }
   }, [isUpdate, reset, subcategory]);
 
@@ -96,7 +102,7 @@ export default function SubCategoryModalForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isUpdate ? "Editar Categoría" : "Agregar nueva Categoría"}
+            {isUpdate ? "Editar Sub Categoría" : "Agregar nueva Sub Categoría"}
           </DialogTitle>
         </DialogHeader>
 

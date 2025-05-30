@@ -12,6 +12,12 @@ const Search = ({ searchTerm, setSearchTerm, resetTerm, className }) => {
         onChange={(e) => handleSeach(e.target.value)}
         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md p-2 focus:border-gray-500 focus:ring-gray-500"
       />
+      <button
+        onClick={() => handleSeach("")}
+        className="cursor-pointer absolute top-1 right-1 ml-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+      >
+        X
+      </button>
     </div>
   );
 };

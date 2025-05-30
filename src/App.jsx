@@ -5,6 +5,7 @@ import AdminLayout from "./pages/AdminLayout";
 import AdminProducts from "./admin/pages/Products";
 import AdminCategories from "./admin/pages/Categories";
 import AdminSubcategoriesPage from "./admin/pages/Subcategories";
+import AdminUsers from "./admin/pages/Users";
 
 import NoFound from "./pages/NotFound";
 
@@ -54,7 +55,7 @@ function App() {
             <Route path="products" element={<AdminProducts />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="subcategories" element={<AdminSubcategoriesPage />} />
-            {/* <Route path="users" element={<AdminUsers />} /> */}
+            <Route path="users" element={<AdminUsers />} />
           </Route>
         </Route>
       </Routes>

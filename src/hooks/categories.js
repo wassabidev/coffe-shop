@@ -4,9 +4,15 @@ import { API_URL } from "@/api/api";
 export const fetchCategories = createAsyncThunk(
   "categories/fetch",
   async ({ page = 1, limit = 10 }) => {
-    const res = await fetch(`${API_URL}/category?page=${page}&limit=${limit}`);
+    try {
+      const res = await fetch(
+        `${API_URL}/category?page=${page}&limit=${limit}`,
+      );
 
-    return await res.json();
+      return await res.json();
+    } catch (err) {
+      throw new Error(err.message || "Error del servidor");
+    }
   },
 );
 
@@ -31,24 +37,42 @@ export const createCategory = createAsyncThunk(
 
 export const updateCategory = createAsyncThunk(
   "category/update",
-  async ({ id, ...data }) => {
-    const res = await fetch(`${API_URL}/category/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+  async ({ id, ...data }, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_URL}/category/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        return rejectWithValue(json);
+      }
 
-    return await res.json();
+      return json;
+    } catch (err) {
+      return rejectWithValue({ message: "Error al actulizar la categoria" });
+    }
   },
 );
 export const deleteCategory = createAsyncThunk(
   "category/delete",
-  async (id) => {
-    const res = await fetch(`${API_URL}/category/${id}`, {
-      method: "DELETE",
-    });
-    return await res.json();
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${API_URL}/category/${id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        return rejectWithValue(json);
+      }
+      return json;
+    } catch (err) {
+      return rejectWithValue({
+        message: "Error de red al eliminar la categoria",
+      });
+    }
   },
 );

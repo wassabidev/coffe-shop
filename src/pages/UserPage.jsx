@@ -9,7 +9,6 @@ const UserPage = ({ isAuthenticated }) => {
   const navigate = useNavigate();
   const { user: userData } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
-  console.log(isAuthenticated);
 
   useEffect(() => {
     if (!isAuthenticated) {

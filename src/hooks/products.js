@@ -1,16 +1,24 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { API_URL } from "@/api/api";
 
-export const fetchProducts = createAsyncThunk("products/fetch", async () => {
-  try {
-    const res = await fetch(`${API_URL}/products`);
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("FETCH FAIL:", error);
-    throw new Error(error.message || "Error del servidor");
-  }
-});
+export const fetchProducts = createAsyncThunk(
+  "products/fetch",
+  async ({ page = 1, limit = 10, all = false }) => {
+    try {
+      const url = all
+        ? `${API_URL}/products?all=true`
+        : `${API_URL}/products?page=${page}&limit=${limit}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      return data;
+    } catch (error) {
+      console.error("FETCH FAIL:", error);
+      throw new Error(error.message || "Error del servidor");
+    }
+  },
+);
 
 export const createProduct = createAsyncThunk(
   "products/create",
@@ -28,7 +36,6 @@ export const createProduct = createAsyncThunk(
 
     const res = await fetch(`${API_URL}/products`, {
       method: "POST",
-
       body: formData,
     });
 
