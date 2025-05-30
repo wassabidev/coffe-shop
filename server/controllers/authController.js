@@ -35,10 +35,36 @@ export const createUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
+    const { page = 1, limit = 10 } = req.query;
+    if (req.query.all === "true") {
+      const users = await User.find({
+        deactivatedAt: { $exists: false },
+      });
+      return res
+        .status(200)
+        .json({ data: users, message: "Usuarios obtenidos sin paginacion" });
+    }
+    const skip = (page - 1) * limit;
     const users = await User.find({
       deactivatedAt: { $exists: false },
+    })
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await User.countDocuments({
+      deactivatedAt: { $exists: false },
     });
-    res.status(200).json(users);
+
+    res.status(200).json({
+      data: {
+        users,
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+      },
+      message: "Usuarios obtenidos con paginacion",
+    });
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });
   }

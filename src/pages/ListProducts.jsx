@@ -10,6 +10,7 @@ import { API_URL } from "@/api/api";
 
 const ListProducts = () => {
   const products = useSelector((state) => state.product.lista);
+
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
@@ -18,12 +19,12 @@ const ListProducts = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchProducts({ all: true }));
   }, [dispatch]);
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get(`${API_URL}/category`);
+      const res = await axios.get(`${API_URL}/category?all=true`);
       setCategories(res.data.data);
       setLoading(false);
     } catch (error) {
@@ -66,16 +67,20 @@ const ListProducts = () => {
           />
           <div className="flex flex-col w-full">
             <Search
-              className="flex justify-end mb-2"
+              className="flex justify-end mb-2 relative"
               searchTerm={inputValue}
               setSearchTerm={setInputValue}
               resetTerm={setSearchTerm}
             />
-            <ul className="justify-center lg:justify-start flex gap-5 flex-wrap">
-              {filtered.map((product) => (
-                <ProductCard product={product} key={product._id} />
-              ))}
-            </ul>
+            {filtered.length > 0 ? (
+              <ul className="justify-center lg:justify-start flex gap-5 flex-wrap">
+                {filtered.map((product) => (
+                  <ProductCard product={product} key={product._id} />
+                ))}
+              </ul>
+            ) : (
+              <StatusView empty={filtered.length === 0} />
+            )}
           </div>
         </main>
       )}

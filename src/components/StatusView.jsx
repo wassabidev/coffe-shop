@@ -20,7 +20,7 @@ const StatusView = ({ loading, error, empty }) => {
   if (empty) {
     return (
       <div className="flex justify-center items-center grow w-full">
-        <h2 className="text-2xl font-bold text-gray-500">
+        <h2 className="text-2xl font-bold text-center text-gray-500">
           No hay productos disponibles
         </h2>
       </div>

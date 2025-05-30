@@ -9,7 +9,10 @@ import {
 const initialState = {
   lista: [],
   loading: false,
-  error: null,
+  fetchError: null,
+  createError: null,
+  updateError: null,
+  deleteError: null,
   total: 0,
   page: 1,
   pages: 1,
@@ -28,7 +31,7 @@ export const CategoriesSlice = createSlice({
       //fetch
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.fetchError = null;
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
@@ -39,7 +42,7 @@ export const CategoriesSlice = createSlice({
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.fetchError = action.payload?.message || action.error.message;
       })
 
       //create
@@ -54,12 +57,13 @@ export const CategoriesSlice = createSlice({
 
       .addCase(createCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.createError = action.payload?.message || action.error.message;
       })
 
       //update
       .addCase(updateCategory.pending, (state) => {
         state.loading = true;
+        state.updateError = null;
       })
 
       .addCase(updateCategory.fulfilled, (state, action) => {
@@ -73,12 +77,13 @@ export const CategoriesSlice = createSlice({
 
       .addCase(updateCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.updateError = action.payload?.message || action.error.message;
       })
 
       //delete
       .addCase(deleteCategory.pending, (state) => {
         state.loading = true;
+        state.deleteError = null;
       })
       .addCase(deleteCategory.fulfilled, (state, action) => {
         state.loading = false;
@@ -88,7 +93,7 @@ export const CategoriesSlice = createSlice({
       })
       .addCase(deleteCategory.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload?.message || action.error.message;
       });
   },
 });

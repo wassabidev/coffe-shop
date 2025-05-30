@@ -26,7 +26,27 @@ export const createProduct = async (req, res) => {
 };
 
 export const getProducts = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
   try {
+    if (req.query.all === "true") {
+      const products = await Product.find({
+        deletedAt: { $exists: false },
+      })
+        .populate("subcategory")
+        .populate({
+          path: "category",
+          populate: {
+            path: "subcategory",
+          },
+        })
+        .sort({ createdAt: -1, _id: -1 });
+
+      return res.status(200).json({
+        message: "Productos sin paginacion optenidos correctamente",
+        data: { products: products },
+      });
+    }
+    const skip = (page - 1) * limit;
     const products = await Product.find({
       deletedAt: { $exists: false },
     })
@@ -36,10 +56,23 @@ export const getProducts = async (req, res) => {
         populate: {
           path: "subcategory",
         },
-      });
-    res
-      .status(200)
-      .json({ message: "Productos optenidos correctamente", data: products });
+      })
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    const total = await Product.countDocuments({
+      deletedAt: { $exists: false },
+    });
+
+    res.status(200).json({
+      message: "Productos con paginacion optenidos correctamente",
+      data: {
+        products,
+        total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error al obtener los productos", error });
   }

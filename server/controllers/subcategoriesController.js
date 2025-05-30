@@ -32,15 +32,32 @@ export const createSubcategory = async (req, res) => {
 export const getsubCategories = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   try {
+    if (req.query.all === "true") {
+      const subcategories = await Subcategory.find({
+        deletedAt: { $exists: false },
+      })
+        .populate("category")
+        .sort({ createdAt: -1, _id: -1 });
+
+      res.status(200).json({
+        data: {
+          subcategories,
+        },
+        message: "Subcategorias optenidas con exito",
+      });
+    }
     const skip = (page - 1) * limit;
     const subcategories = await Subcategory.find({
       deletedAt: { $exists: false },
     })
       .populate("category")
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-    const total = await Subcategory.countDocuments();
+
+    const total = await Subcategory.countDocuments({
+      deletedAt: { $exists: false },
+    });
     res.status(200).json({
       data: {
         subcategories,

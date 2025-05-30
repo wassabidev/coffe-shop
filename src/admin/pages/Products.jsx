@@ -17,8 +17,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import toast from "react-hot-toast";
+import { Loader2 } from "lucide-react";
 import {
   createProduct,
   deleteProduct,
@@ -26,18 +35,20 @@ import {
   updateProduct,
 } from "../../hooks/products";
 import { useDispatch, useSelector } from "react-redux";
-import { API_URL } from "@/api/api";
 
 export default function Products() {
-  const products = useSelector((state) => state.product.lista);
-  const loading = useSelector((state) => state.product.loading);
-  const error = useSelector((state) => state.product.error);
-
-  const dispatch = useDispatch();
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
+
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.product.lista);
+  const totalPages = useSelector((state) => state.product.pages);
+  const loading = useSelector((state) => state.product.loading);
+  const error = useSelector((state) => state.product.error);
 
   const handleAddProduct = async (data) => {
     await dispatch(createProduct(data));
@@ -48,7 +59,7 @@ export default function Products() {
     toast(
       () => (
         <>
-          <p>producto creado con exito</p>
+          <p>Producto creado con exito!</p>
         </>
       ),
       {
@@ -64,10 +75,10 @@ export default function Products() {
     await dispatch(
       updateProduct({ id: currentProduct._id, ...updatedProduct }),
     );
+    await dispatch(fetchProducts({ page, limit }));
     setIsModalOpen(false);
     setCurrentProduct(null);
     setIsUpdate(false);
-    await dispatch(fetchProducts());
   };
 
   const removeItemById = (id) => {
@@ -78,11 +89,17 @@ export default function Products() {
   );
 
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchProducts({ page, limit }));
+  }, [dispatch, page]);
 
   if (loading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      </div>
+    );
   }
 
   if (error) {
@@ -95,14 +112,14 @@ export default function Products() {
   }
 
   return (
-    <>
+    <div className="p-2 bg-gray-100 rounded-lg">
       <PageHeader
         title="Lista de Productos"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
         addTitle={"Agregar Producto"}
-        onRefresh={() => dispatch(fetchProducts())}
+        onRefresh={() => dispatch(fetchProducts({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -169,6 +186,37 @@ export default function Products() {
             ))}
           </TableBody>
         </Table>
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              />
+            </PaginationItem>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <PaginationItem key={i}>
+                <PaginationLink
+                  href="#"
+                  isActive={i + 1 === page}
+                  onClick={() => setPage(i + 1)}
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
 
       {isModalOpen && (
@@ -183,6 +231,6 @@ export default function Products() {
           product={currentProduct}
         />
       )}
-    </>
+    </div>
   );
 }
