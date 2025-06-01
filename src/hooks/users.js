@@ -6,8 +6,8 @@ export const fetchUsers = createAsyncThunk(
   async ({ page = 1, limit, all = false }) => {
     try {
       const url = all
-        ? `${API_URL}/users?all=true`
-        : `${API_URL}/users?page=${page}&limit=${limit}`;
+        ? `${API_URL}/user?all=true`
+        : `${API_URL}/user?page=${page}&limit=${limit}`;
       const res = await fetch(url);
       const data = await res.json();
       return data;

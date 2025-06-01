@@ -5,10 +5,10 @@ import {
   getOrderById,
   getOrderByUserId,
 } from "../controllers/orderController.js";
-import { verificarToken } from "../middleware/auth.js";
+import { authenticate } from "../middleware/auth.js";
 const router = express.Router();
 
-router.post("/", verificarToken, createOrder);
+router.post("/", authenticate, createOrder);
 router.get("/", getOrders);
 router.get("/:id", getOrderById);
 router.get("/user/:id", getOrderByUserId);

@@ -1,9 +1,17 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchFavorites } from "../hooks/favorites";
+import ProductCard from "@/components/ProductCard";
 
 const Favorites = () => {
-  const favoritesItems = useSelector((store) => store.favorites);
+  const favoritesItems = useSelector((state) => state.favorites.lista);
+  const { isAuthenticated } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
-  if (favoritesItems.length === 0) {
+  if (isAuthenticated) {
+    dispatch(fetchFavorites());
+  }
+
+  if (favoritesItems.length === 0 || !favoritesItems) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="text-3xl font-bold text-left my-4">
@@ -23,9 +31,12 @@ const Favorites = () => {
   }
   return (
     <section>
-      {favoritesItems.map((favorite) => (
-        <p>{favorite.name}</p>
-      ))}
+      <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
+      <div className="container">
+        {favoritesItems.map((favorite) => (
+          <ProductCard product={favorite} />
+        ))}
+      </div>
     </section>
   );
 };

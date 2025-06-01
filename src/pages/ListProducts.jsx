@@ -73,7 +73,7 @@ const ListProducts = () => {
               resetTerm={setSearchTerm}
             />
             {filtered.length > 0 ? (
-              <ul className="justify-center lg:justify-start flex gap-5 flex-wrap">
+              <ul className="container">
                 {filtered.map((product) => (
                   <ProductCard product={product} key={product._id} />
                 ))}

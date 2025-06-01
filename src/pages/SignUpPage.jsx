@@ -50,19 +50,25 @@ const SignUpPage = () => {
   }
   const onSubmit = async (data) => {
     try {
-      await axios.post(`${API_URL}/register`, data);
+      setLoading(true);
+      await axios.post(`${API_URL}/user/register`, data);
       toast.success("Usuario creado con éxito");
       setTimeout(() => {
         setLoading(false);
       }, "800");
+      setError("");
+
       navigate("/login");
     } catch (error) {
-      setError(error.response?.data?.mensaje || "Error al iniciar sesión");
+      setError(error.response?.data?.message || "Error al iniciar sesión");
+      setTimeout(() => {
+        setLoading(false);
+      }, "500");
     }
   };
 
   return (
-    <div className="flex h-dvh w-full">
+    <div className="flex h-dvh w-full justify-center">
       {loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="flex flex-col items-center gap-3">
@@ -83,9 +89,11 @@ const SignUpPage = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col gap-3 lg:w-10/12"
         >
-          <div className="border-red-500 bg-red-200 p-3 rounded-md">
-            {error}
-          </div>
+          {error && (
+            <div className="border-red-500 border bg-red-100 text-red-500 p-3 rounded-md">
+              {error}
+            </div>
+          )}
           <div>
             <label htmlFor="name">Nombre</label>
             <input
