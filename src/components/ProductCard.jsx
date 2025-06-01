@@ -5,25 +5,34 @@ import { formatPrice } from "../utils/price";
 import {
   addFavorite,
   removeFavorite,
+  //resetFavorites,
 } from "../features/favorites/favoriteSlice";
-
+import { toggleFavorite } from "../hooks/favorites";
 import DefaulImage from "/assets/product-placeholder.png";
 
 const ProductCard = ({ product }) => {
-  const favorites = useSelector((state) => state.favorites);
+  const favorites = useSelector((state) => state.favorites.lista || []);
+  console.log("favorites", favorites);
+  const { isAuthenticated } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isFavorited = favorites.some(
-    (favorite) => favorite._id === product._id,
-  );
+  const isFavorited = favorites.some((favorite) => {
+    if (!favorite) return false;
+    const favProduct = favorite.product || favorite;
+    return favProduct?._id === product._id;
+  });
 
   const handleFavorite = (event, product) => {
     event.stopPropagation();
-    if (isFavorited) {
-      dispatch(removeFavorite(product));
+    if (isAuthenticated) {
+      dispatch(toggleFavorite(product._id));
     } else {
-      dispatch(addFavorite(product));
+      if (isFavorited) {
+        dispatch(removeFavorite(product));
+      } else {
+        dispatch(addFavorite(product));
+      }
     }
   };
 
@@ -40,15 +49,14 @@ const ProductCard = ({ product }) => {
   return (
     <li
       key={product._id}
-      className="cursor-pointer flex flex-col gap-2 p-3 rounded-md border-[0.1rem] border-gray-200 w-3xs sm:w-2/5 md:w-2/6 lg:w-52 shadow-md hover:shadow-lg transition-all duration-300"
+      className="cursor-pointer flex flex-col gap-2 p-3 rounded-md border-[0.1rem] border-gray-200 w-full shadow-md hover:shadow-lg transition-all duration-300"
       onClick={handleNavigate}
     >
       <div className="relative">
         <img
           src={!product.image ? DefaulImage : `/uploads/${product.image}`}
-          className="rounded-lg"
-          alt=""
-          style={{ viewTransitionName: `product-${product._id}` }}
+          className="rounded-lg object-cover h-52 w-full"
+          alt={product.name || "Default Image"}
         />
         <button
           className={`absolute cursor-pointer top-2 right-2`}

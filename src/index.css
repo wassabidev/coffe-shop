@@ -4,6 +4,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
+.ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+li::marker{
+  content: "";
+}
+
+.container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1.2rem;
+}
 @keyframes steamUp {
     0% {
       stroke-dashoffset: 100;

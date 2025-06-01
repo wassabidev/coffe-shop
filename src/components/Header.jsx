@@ -18,7 +18,7 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const navItems = [
-    { label: "Prodouctos", path: "/" },
+    { label: "Productos", path: "/" },
     { label: "Favoritos", path: "/favorites" },
     { label: "Nosotros", path: "/about-us" },
     { label: "Contactos", path: "/contacts" },

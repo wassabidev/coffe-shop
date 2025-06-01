@@ -63,6 +63,9 @@ const LoginPage = () => {
       //esto  cambiar por un div en la parte superior
       // del form
       setError(error.response?.data?.mensaje || "Error al iniciar sesión");
+      setTimeout(() => {
+        setLoading(false);
+      }, "800");
     }
   };
 
@@ -95,9 +98,11 @@ const LoginPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-3"
           >
-            <div className="border-red-500 bg-red-200 p-3 rounded-md">
-              {error}
-            </div>
+            {error && (
+              <div className="border-red-500 border text-red-400 bg-red-100 p-3 rounded-md">
+                {error}
+              </div>
+            )}
             <div>
               <label htmlFor="email">Correo</label>
               <input

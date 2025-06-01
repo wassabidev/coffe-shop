@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import { getSession } from "../middleware/session.js";
 dotenv.config();
 
-async function verificarToken(req, res, next) {
+async function authenticate(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
   const refreshToken = req.headers["x-refresh-token"];
   if (!token) {
@@ -34,7 +34,7 @@ async function verificarToken(req, res, next) {
     /*const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;*/
     console.log(
-      `🔁 Nuevo token generado para el usuario ${session.userId} a las ${new Date().toLocaleString()}`,
+      ` Nuevo token generado para el usuario ${session.userId} a las ${new Date().toLocaleString()}`,
     );
 
     req.user = verifyJWT(newToken).payload;
@@ -59,7 +59,7 @@ function permitirRoles(...rolesPermitidos) {
   };
 }
 
-export { verificarToken, permitirRoles };
+export { authenticate, permitirRoles };
 
 function verifyJWT(token) {
   try {
@@ -67,7 +67,7 @@ function verifyJWT(token) {
     return { expired: false, payload };
   } catch (err) {
     if (err.name === "TokenExpiredError") {
-      const payload = jwt.decode(token); // no lanza error
+      const payload = jwt.decode(token);
       return { expired: true, payload };
     }
     return { expired: false, payload: null };
