@@ -4,7 +4,7 @@ import { useNavigate, NavLink } from "react-router-dom";
 import { logout } from "../features/users/userSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, Text, X, LogOut, LogIn } from "lucide-react";
 
 const Header = () => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const Header = () => {
     { label: "Productos", path: "/" },
     { label: "Favoritos", path: "/favorites" },
     { label: "Nosotros", path: "/about-us" },
-    { label: "Contactos", path: "/contacts" },
+    { label: "Historial", path: "/history" },
   ];
 
   const Avatar = () => {
@@ -80,9 +80,7 @@ const Header = () => {
             className="space-y-2 block md:hidden cursor-pointer"
             onClick={() => setIsNavOpen((prev) => !prev)}
           >
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
-            <span className="block h-0.5 w-8 bg-gray-600"></span>
+            <Text />
           </div>
 
           <div>
@@ -95,28 +93,15 @@ const Header = () => {
           </div>
 
           <div
-            className={
-              isNavOpen
-                ? "flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-20 "
-                : "hidden"
-            }
+            className={`${
+              isNavOpen ? "translate-x-0" : "-translate-x-full"
+            } flex justify-center items-center absolute h-dvh w-full top-0 left-0 bg-slate-50 z-20 transition-all duration-300 ease-in-out transform`}
           >
             <div
-              className="absolute top-0 right-0 px-8 py-8 cursor-pointer"
+              className="absolute top-0 left-0 p-5 cursor-pointer"
               onClick={() => setIsNavOpen(false)}
             >
-              <svg
-                className="h-8 w-8 text-gray-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
+              <X />
             </div>
             <ul className="flex flex-col items-center justify-between min-h-[250px]">
               {navItems.map(({ label, path }) => (
@@ -184,19 +169,20 @@ const Header = () => {
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
                       >
-                        Account settings
+                        Mi perfil
                       </Link>
                     </>
                   )}
 
                   <div>
                     <button
-                      className="block w-full px-4 py-2 text-left text-sm text-gray-700 cursor-pointer hover:bg-slate-100"
+                      className="flex gap-2 w-full px-4 py-2 text-left text-sm text-gray-700 cursor-pointer hover:bg-slate-100"
                       onClick={() => {
                         isAuthenticated ? handleLogout() : navigate("/login");
                       }}
                     >
-                      {isAuthenticated ? "Sign out" : "Sign in"}
+                      {isAuthenticated ? "Cerrar sesion" : "Iniciar sesion"}
+                      {isAuthenticated ? <LogOut /> : <LogIn />}
                     </button>
                   </div>
                 </div>

@@ -23,23 +23,79 @@ export const createOrder = async (req, res) => {
 };
 
 export const getOrders = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
   try {
-    const orders = await Order.find();
-    res.status(200).json(orders);
+    if (req.query.all === "true") {
+      const orders = await Order.find();
+      return res.status(200).json({
+        message: "Ordenes obtenidas sin paginacion",
+        data: orders,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const total = await Order.countDocuments();
+    const orders = await Order.find()
+      .sort({ createdAt: -1, id: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .total(total);
+
+    if (!orders) {
+      return res.status(404).json({ message: "Orden no encontrado" });
+    }
+
+    res.status(200).json({
+      message: "Ordenes obtenida con paginacion",
+      data: {
+        orders: orders,
+        total: total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener los ordenes", error });
+    res
+      .status(500)
+      .json({ message: "Error al obtener los ordenes", error: error.message });
   }
 };
 
 export const getOrderByUserId = async (req, res) => {
   const { id } = req.params;
+  const { page = 1, limit = 10 } = req.query;
+
   try {
-    const orders = await Order.find({ user: id }).populate("items.product");
+    if (req.query.all === "true") {
+      const orders = await Order.find({ user: id }).populate("items.product");
+
+      return res.status(200).json({
+        message: "Ordenes obtenidas sin paginacion",
+        data: orders,
+      });
+    }
+
+    const skip = (page - 1) * limit;
+    const total = await Order.countDocuments({ user: req.params.id });
+    const orders = await Order.find({ user: id })
+      .populate("items.product")
+      .sort({ createdAt: -1, _id: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
 
     if (!orders) {
       return res.status(404).json({ message: "Orden no encontrado" });
     }
-    res.status(200).json(orders);
+
+    res.status(200).json({
+      message: "Ordenes obtenida con paginacion",
+      data: {
+        orders: orders,
+        total: total,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Error al obtener las Orden", error });
   }
