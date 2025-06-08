@@ -8,6 +8,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import subcategoryRoutes from "./routes/subcategoryRoutes.js";
+import roleRoutes from "./routes/roleRoutes.js";
+import favoritesRoutes from "./routes/favoriteRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -29,6 +32,9 @@ app.use("/api/products", productRoutes);
 app.use("/api", loginRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/role", roleRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/favorites", favoritesRoutes);
 app.use("/api/subcategory", subcategoryRoutes);
 
 app.use("/api/admin", adminRoutes);

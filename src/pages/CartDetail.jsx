@@ -34,11 +34,14 @@ const CartDetail = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     if (!isAuthenticated) {
-      toast.error("Debes iniciar sesión para confirmar la compra", {
-        position: "top-center",
-      });
+      setIsLoading(true);
+      setTimeout(() => {
+        setIsLoading(false);
+        toast.error("Debes iniciar sesión para confirmar la compra", {
+          position: "top-center",
+        });
+      }, 800);
       return;
     }
     try {
@@ -51,7 +54,7 @@ const CartDetail = () => {
       dispatch(clearCart());
       setTimeout(() => {
         setIsLoading(false);
-      }, 5000);
+      }, 2000);
     } catch (error) {
       setIsLoading(false);
       console.error(
@@ -106,7 +109,7 @@ const CartDetail = () => {
                 <img
                   src={`/uploads/${item.product.image}`}
                   alt={item.product.name}
-                  className="w-25 h-25 rounded-full"
+                  className="w-25 h-25 rounded-full object-cover"
                 />
                 <div className="w-full">
                   <div className="flex lg:gap-2 flex-wrap items-center justify-between">

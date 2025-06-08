@@ -4,7 +4,7 @@ import { Instagram, Phone } from "lucide-react";
 const Footer = () => {
   const navItems = [
     { label: "Nosotros", path: "/about-us" },
-    { label: "Contactos", path: "contact" },
+    { label: "Contactos", path: "/contact" },
     { label: "Ubicación", path: "/ubication" },
   ];
   return (

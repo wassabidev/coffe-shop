@@ -10,7 +10,7 @@ const SideBar = ({ data, setSearchTerm, resetInput }) => {
   };
 
   return (
-    <aside className="w-64 hidden md:block bg-white min-h-dvh p-4 md:ml-8 lg:ml-12">
+    <aside className="max-w-60 min-w-40 hidden md:block bg-white min-h-dvh p-4 md:ml-0 lg:ml-12 transition-all duration-500">
       {data ? (
         data.categories.map((item, index) => (
           <div key={index} className="mb-4">

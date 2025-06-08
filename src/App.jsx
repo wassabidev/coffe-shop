@@ -19,6 +19,8 @@ import SignUpPage from "./pages/SignUpPage";
 import UserPage from "./pages/UserPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useSelector } from "react-redux";
+import AboutUsPage from "./pages/AboutUsPage";
+import ContactUsPage from "./pages/ContactUsPage";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.user);
@@ -35,6 +37,8 @@ function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/favorites" element={<Favorite />} />
           <Route path="/history" element={<History />} />
+          <Route path="/about-us" element={<AboutUsPage />} />
+          <Route path="/contact" element={<ContactUsPage />} />
           <Route
             path="/user"
             element={<UserPage isAuthenticated={isAuthenticated} />}
