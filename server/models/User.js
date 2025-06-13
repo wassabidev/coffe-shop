@@ -16,9 +16,8 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
     role: {
-      type: String,
-      enum: ["admin", "cashier", "manager", "customer"],
-      default: "customer",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Roles",
       required: true,
     },
     lastLogin: {

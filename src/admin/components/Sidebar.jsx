@@ -1,6 +1,13 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { Menu, Tags, LayoutGrid, User, PackageSearch } from "lucide-react";
+import {
+  Menu,
+  Tags,
+  LayoutGrid,
+  User,
+  PackageSearch,
+  Bolt,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -30,6 +37,11 @@ const navItems = [
     label: "Usuarios",
     path: "/admin/users",
     icon: <User className="w-4 h-4" />,
+  },
+  {
+    label: "Roles",
+    path: "/admin/rols",
+    icon: <Bolt className="w-4 h-4" />,
   },
 ];
 

@@ -8,6 +8,7 @@ import userReducer from "../features/users/userSlice";
 import ProductsReducer from "../features/products/productSlice";
 import CategoriesReducer from "../features/categories/categorySlice";
 import SubcategoriesReducer from "../features/subcategories/subcategorySlice";
+import RolesReducer from "../features/roles/roleSlice";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   user: userReducer,
   product: ProductsReducer,
   category: CategoriesReducer,
+  role: RolesReducer,
   subcategory: SubcategoriesReducer,
 });
 

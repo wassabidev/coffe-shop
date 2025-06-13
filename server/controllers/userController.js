@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Role from "../models/Role.js";
 import bcrypt from "bcryptjs";
 
 export const createUser = async (req, res) => {
@@ -9,7 +10,11 @@ export const createUser = async (req, res) => {
     const userExist = await User.exists({ email });
 
     if (userExist) {
-      res.status(403).json({ message: "Usuario con email ya exite" });
+      return res.status(403).json({ message: "Usuario con email ya exite" });
+    }
+    const roleExist = await Role.findById(role);
+    if (!roleExist) {
+      return res.status(400).json({ message: "El rol especificado no existe" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
@@ -21,7 +26,8 @@ export const createUser = async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).json(newUser);
+    await newUser.populate("role");
+    return res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al crear el usuario", error });
@@ -30,19 +36,22 @@ export const createUser = async (req, res) => {
 
 export const getUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    if (req.query.all === "true") {
-      const users = await User.find({
-        deactivatedAt: { $exists: false },
+    const { page = 1, limit = 10, all } = req.query;
+
+    if (all === "true") {
+      const users = await User.find({ deactivatedAt: null })
+        .populate("role")
+        .sort({ createdAt: -1, _id: -1 });
+
+      return res.status(200).json({
+        data: { users },
+        message: "Usuarios obtenidos sin paginacion",
       });
-      return res
-        .status(200)
-        .json({ data: users, message: "Usuarios obtenidos sin paginacion" });
     }
+
     const skip = (page - 1) * limit;
-    const users = await User.find({
-      deactivatedAt: { $exists: false },
-    })
+    const users = await User.find({ deactivatedAt: null })
+      .populate("role")
       .sort({ createdAt: -1, _id: -1 })
       .skip(skip)
       .limit(parseInt(limit));
@@ -50,7 +59,6 @@ export const getUsers = async (req, res) => {
     const total = await User.countDocuments({
       deactivatedAt: { $exists: false },
     });
-
     res.status(200).json({
       data: {
         users,
@@ -61,9 +69,11 @@ export const getUsers = async (req, res) => {
       message: "Usuarios obtenidos con paginacion",
     });
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener los productos", error });
+    console.error("❌ Error in getUsers:", error);
+    res.status(500).json({ message: "Error al obtener los usuarios", error });
   }
 };
+
 export const deleteUser = async (req, res) => {
   const { id } = req.params;
 
@@ -78,6 +88,6 @@ export const deleteUser = async (req, res) => {
     }
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener los productos", error });
+    res.status(500).json({ message: "Error al obtener los usuarios", error });
   }
 };

@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -29,12 +30,13 @@ export default function UserModalForm({
 }) {
   const [roles, setRoles] = useState([]);
   const formSchema = z.object({
-    name: z.string().trim().nonempty({ message: "Este campo es obligatorio" }),
-    category: z
+    name: z.string().trim().nonempty({ message: "Campo obligatorio" }),
+    email: z.string().email({ message: "Email inválido" }),
+    password: z
       .string()
-      .trim()
-      .nonempty({ message: "Este campo es obligatorio" }),
-    description: z.string().default(""),
+      .min(6, { message: "Mínimo 6 caracteres" })
+      .max(32, { message: "Máximo 32 caracteres" }),
+    role: z.string().nonempty({ message: "Campo obligatorio" }),
   });
 
   const {
@@ -47,8 +49,9 @@ export default function UserModalForm({
   } = useForm({
     defaultValues: {
       name: "",
-      description: "",
-      category: "",
+      email: "",
+      password: "",
+      role: "",
     },
     resolver: zodResolver(formSchema),
   });
@@ -62,13 +65,17 @@ export default function UserModalForm({
     if (isUpdate && user) {
       reset({
         name: user.name,
-        category: user.category?._id,
+        email: user.email,
+        password: user.password,
+        role: user.role?._id,
         description: user.description,
       });
     } else {
       reset({
         name: "",
-        category: "",
+        role: "",
+        email: "",
+        password: "",
         description: "",
       });
     }
@@ -77,7 +84,7 @@ export default function UserModalForm({
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const res = await fetch(`${API_URL}/category?all=true`);
+        const res = await fetch(`${API_URL}/role?all=true`);
         const data = await res.json();
         setRoles(data.data.roles);
       } catch (error) {
@@ -126,46 +133,60 @@ export default function UserModalForm({
             )}
           </div>
           <div>
-            <Label className="mb-2">Categoría</Label>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              {...register("email")}
+              className={`${errors.email ? "border-red-500" : ""} mt-2`}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="password">Contraseña</Label>
+            <Input
+              id="password"
+              type="password"
+              {...register("password")}
+              className={`${errors.password ? "border-red-500" : ""} mt-2`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </div>
+          <div>
+            <Label className="mb-2">Roles</Label>
             <Controller
-              name="category"
+              name="role"
               control={control}
               rules={{ required: true }}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger
                     className={`${
-                      errors.category
+                      errors.role
                         ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
                         : " "
                     } w-full`}
                   >
                     {roles.find((c) => c._id == field.value)?.name ||
-                      "Selecciona una categoria"}
+                      "Selecciona un role"}
                   </SelectTrigger>
                   <SelectContent>
-                    {roles.map((category) => (
-                      <SelectItem key={category._id} value={category._id}>
-                        {category.name}
+                    {roles.map((role) => (
+                      <SelectItem key={role._id} value={role._id}>
+                        {role.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               )}
             />
-            {errors.category && (
-              <p className="text-red-500 text-sm">{errors.category.message}</p>
+            {errors.role && (
+              <p className="text-red-500 text-sm">{errors.role.message}</p>
             )}
-          </div>
-
-          <div>
-            <Label htmlFor="description">Descripción</Label>
-            <Textarea
-              className="mt-2"
-              id="description"
-              rows={3}
-              {...register("description")}
-            />
           </div>
 
           <DialogFooter>
