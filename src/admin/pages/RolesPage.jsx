@@ -18,76 +18,68 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Loader2 } from "lucide-react";
-
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import UserModal from "../components/forms/UserForm";
+import RoleModal from "../components/forms/RoleForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import {
-  createUser,
-  deleteUser,
-  fetchUsers,
-  updateUser,
-} from "../../hooks/users";
+  createRole,
+  deleteRole,
+  fetchRoles,
+  updateRole,
+} from "../../hooks/roles";
 
-export default function Users() {
+export default function RolesPage() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentRole, setCurrentRole] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.user.lista);
-  const totalPages = useSelector((state) => state.user.pages);
-  const loading = useSelector((state) => state.user.loading);
+  const roles = useSelector((state) => state.role.lista);
+  const totalPages = useSelector((state) => state.role.pages);
+  const loading = useSelector((state) => state.role.loading);
 
-  const handleAddUser = async (newUser) => {
+  const handleAddRole = async (newCategory) => {
     try {
-      await dispatch(createUser(newUser)).unwrap();
+      await dispatch(createRole(newCategory)).unwrap();
       setIsModalOpen(false);
-      await dispatch(fetchUsers({ page, limit }));
       return true;
     } catch (err) {
-      console.error("❌ Error creating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
+      toast.error(`${err}`, {
+        position: "top-center",
+      });
       return false;
     }
   };
 
-  const handleUpdateUser = async (updatedUser) => {
-    try {
-      await dispatch(updateUser({ id: currentUser._id, ...updatedUser }));
-      setIsModalOpen(false);
-      setCurrentUser(null);
-      setIsUpdate(false);
-      await dispatch(fetchUsers({ page, limit }));
-    } catch (err) {
-      console.error("❌ Error creating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
-      return false;
-    }
+  const handleUpdateRole = async (updatedRole) => {
+    await dispatch(updateRole({ id: currentRole._id, ...updatedRole }));
+    setIsModalOpen(false);
+    setCurrentRole(null);
+    setIsUpdate(false);
+    await dispatch(fetchRoles({ page, limit }));
   };
 
-  const filteredData = users.filter((user) =>
-    user?.name.toLowerCase().includes(search.toLowerCase()),
+  const filteredData = roles.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const removeItemById = async (id) => {
-    await dispatch(deleteUser(id));
-    await dispatch(fetchUsers({ page, limit }));
+    await dispatch(deleteRole(id));
+    await dispatch(fetchRoles({ page, limit }));
   };
 
   useEffect(() => {
-    dispatch(fetchUsers({ page, limit }));
+    dispatch(fetchRoles({ page, limit }));
   }, [dispatch, page]);
 
   if (loading) {
@@ -98,12 +90,12 @@ export default function Users() {
     <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
-        title="Usuarios List"
+        title="Lista de Roles "
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
-        addTitle={"Agregar Usuario"}
-        onRefresh={() => dispatch(fetchUsers({ page, limit }))}
+        addTitle={"Agregar roles"}
+        onRefresh={() => dispatch(fetchRoles({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -112,7 +104,7 @@ export default function Users() {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead>Rol</TableHead>
+              <TableHead>Descripcion</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -120,9 +112,7 @@ export default function Users() {
             {filteredData.map((row) => (
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>
-                  <Badge className="m-1">{row.role?.name}</Badge>
-                </TableCell>
+                <TableCell>{row.description}</TableCell>
 
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -141,7 +131,7 @@ export default function Users() {
                         onClick={() => {
                           setIsUpdate(true);
                           setIsModalOpen(true);
-                          setCurrentUser(row);
+                          setCurrentRole(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -191,16 +181,16 @@ export default function Users() {
       </div>
 
       {isModalOpen && (
-        <UserModal
+        <RoleModal
           open={isModalOpen}
           isUpdate={isUpdate}
-          user={currentUser}
+          role={currentRole}
           onCancel={() => {
             setIsModalOpen(false);
-            setCurrentUser(null);
+            setCurrentRole(null);
             setIsUpdate(false);
           }}
-          onSubmit={isUpdate ? handleUpdateUser : handleAddUser}
+          onSubmit={isUpdate ? handleUpdateRole : handleAddRole}
         />
       )}
     </div>

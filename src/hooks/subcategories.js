@@ -31,7 +31,8 @@ export const createsubCategory = createAsyncThunk(
       }
 
       return json;
-    } catch (error) {
+    } catch (err) {
+      console.log(err);
       return rejectWithValue({ message: "Error de red al crear subcategoría" });
     }
   },
@@ -57,6 +58,8 @@ export const updatesubCategory = createAsyncThunk(
 
       return json;
     } catch (err) {
+      console.log(err);
+
       return rejectWithValue({
         message: "Error de red al actulizar subcategoría",
       });
@@ -77,6 +80,7 @@ export const deletesubCategory = createAsyncThunk(
       }
       return json;
     } catch (err) {
+      console.log(err);
       return rejectWithValue({
         message: "Error de red al eliminar subcategoría",
       });

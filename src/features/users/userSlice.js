@@ -37,6 +37,17 @@ export const userSlice = createSlice({
       state.refreshToken = null;
       state.isAuthenticated = false;
     },
+    resetUsers: (state) => {
+      state.lista = [];
+      state.total = 0;
+      state.page = 1;
+      state.pages = 1;
+      state.loading = false;
+      state.fetchError = null;
+      state.createError = null;
+      state.updateError = null;
+      state.deleteError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -47,10 +58,12 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.lista = action.payload.data.users;
-        state.total = action.payload.data.total;
-        state.page = action.payload.data.page;
-        state.pages = action.payload.data.pages;
+        const data = action.payload?.data || {};
+
+        state.lista = data.users || [];
+        state.total = data.total || 0;
+        state.page = data.page || 1;
+        state.pages = data.pages || 1;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;
@@ -64,7 +77,8 @@ export const userSlice = createSlice({
       })
       .addCase(createUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.lista.push(action.payload.data);
+        const createdUser = action.payload?.data || action.payload;
+        state.lista.push(createdUser);
       })
       .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
@@ -106,6 +120,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setUser, logout } = userSlice.actions;
+export const { setUser, logout, resetUsers } = userSlice.actions;
 
 export default userSlice.reducer;

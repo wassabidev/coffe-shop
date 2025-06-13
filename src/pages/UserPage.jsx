@@ -19,7 +19,7 @@ const UserPage = ({ isAuthenticated }) => {
     //a mejorar, usar tablas
     <div className="w-full">
       <div className="w-20 h-20 bg-gray-200 rounded-full flex justify-center items-center">
-        <User />
+        <User className="w-10 h-10" />
       </div>
       <h1 className="text-2xl font-semibold text-left my-4">
         {userData?.name}

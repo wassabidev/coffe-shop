@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./components/Layout";
 
 import AdminLayout from "./pages/AdminLayout";
@@ -6,6 +11,7 @@ import AdminProducts from "./admin/pages/Products";
 import AdminCategories from "./admin/pages/Categories";
 import AdminSubcategoriesPage from "./admin/pages/Subcategories";
 import AdminUsers from "./admin/pages/Users";
+import AdminRoles from "./admin/pages/RolesPage";
 
 import NoFound from "./pages/NotFound";
 
@@ -56,10 +62,12 @@ function App() {
           }
         >
           <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="products" replace />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="categories" element={<AdminCategories />} />
             <Route path="subcategories" element={<AdminSubcategoriesPage />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="rols" element={<AdminRoles />} />
           </Route>
         </Route>
       </Routes>
