@@ -36,8 +36,13 @@ async function authenticate(req, res, next) {
     console.log(
       ` Nuevo token generado para el usuario ${session.userId} a las ${new Date().toLocaleString()}`,
     );
+    res.setHeader("x-access-token", newToken);
 
-    req.user = verifyJWT(newToken).payload;
+    req.user = {
+      id: session.userId,
+      email: session.email,
+      role: session.role,
+    };
     next();
   } catch (err) {
     return res.status(401).json({ message: "Invalid token", err });

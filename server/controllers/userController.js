@@ -98,3 +98,23 @@ export const deleteUser = async (req, res) => {
     res.status(500).json({ message: "Error al obtener los usuarios", error });
   }
 };
+
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.body.password) {
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    res
+      .status(200)
+      .json({ data: updatedUser, message: "Usuario actualizado con exito" });
+  } catch (err) {
+    res.status(500).json({ message: "Error actualizando usuario", error: err });
+  }
+};

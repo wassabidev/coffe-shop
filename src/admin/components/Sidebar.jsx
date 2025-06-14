@@ -1,5 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AvatarCard from "@/components/AvatarCard";
+import { logout } from "../../features/users/userSlice";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { API_URL } from "@/api/api";
+import { useDispatch } from "react-redux";
 import {
   Menu,
   Tags,
@@ -7,6 +13,7 @@ import {
   User,
   PackageSearch,
   Bolt,
+  Loader2,
 } from "lucide-react";
 import {
   Sheet,
@@ -40,13 +47,45 @@ const navItems = [
   },
   {
     label: "Roles",
-    path: "/admin/rols",
+    path: "/admin/roles",
     icon: <Bolt className="w-4 h-4" />,
   },
 ];
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user: userData } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchRole = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/role/${userData.role}`);
+      setRole(res.data);
+      setLoading(false);
+    } catch (err) {
+      setError(err);
+      console.error("Error fetching role:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userData && userData.role) {
+      fetchRole();
+    } else {
+      setLoading(false);
+    }
+  }, [userData]);
+  if (loading) {
+    return (
+      <div className="flex w-full flex-col items-center justify-center h-screen">
+        <Loader2 />
+      </div>
+    );
+  }
 
   const content = (
     <nav className="flex flex-col gap-2 p-4">
@@ -91,6 +130,14 @@ export default function Sidebar() {
               <SheetTitle>Menú</SheetTitle>
             </SheetHeader>
             {content}
+            <AvatarCard
+              user={userData}
+              role={role}
+              onLogout={() => {
+                dispatch(logout());
+                setIsOpen(false);
+              }}
+            />
           </SheetContent>
         </Sheet>
       </div>

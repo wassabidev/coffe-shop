@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
 import {
   Pagination,
   PaginationContent,
@@ -89,6 +90,7 @@ export default function RolesPage() {
   return (
     <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
+
       <PageHeader
         title="Lista de Roles "
         onBack={() => window.history.back()}

@@ -1,8 +1,11 @@
 import Order from "../models/Order.js";
+import User from "../models/User.js";
+import { sendOrderEmail } from "../utils/sendOrderEmail.js";
 
 export const createOrder = async (req, res) => {
   try {
     const { items, total } = req.body;
+    const user = req.user;
     const newOrder = new Order({
       user: req.user.id,
       items: items.map((item) => ({
@@ -15,6 +18,12 @@ export const createOrder = async (req, res) => {
       paidAt: new Date(),
     });
     await newOrder.save();
+
+    await sendOrderEmail({
+      userEmail: user.email,
+      items,
+      total,
+    });
     res.status(201).json(newOrder);
   } catch (error) {
     console.error("Error al crear la orden:", error);

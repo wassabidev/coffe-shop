@@ -17,93 +17,140 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Loader2 } from "lucide-react";
-
+import toast, { Toaster } from "react-hot-toast";
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import UserModal from "../components/forms/UserForm";
+import SubcategoryModal from "../components/forms/SubcategoryForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
-import toast, { Toaster } from "react-hot-toast";
 import {
-  createUser,
-  deleteUser,
-  fetchUsers,
-  updateUser,
-} from "../../hooks/users";
+  createsubCategory,
+  deletesubCategory,
+  fetchsubCategories,
+  updatesubCategory,
+} from "../../hooks/subcategories";
 
-export default function Users() {
+export default function SubCategories() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentSubCategory, setCurrentSubCategory] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const dispatch = useDispatch();
-  const users = useSelector((state) => state.user.lista);
-  const totalPages = useSelector((state) => state.user.pages);
-  const loading = useSelector((state) => state.user.loading);
+  const subcategories = useSelector((state) => state.subcategory.lista);
+  const totalPages = useSelector((state) => state.subcategory.pages);
+  const loading = useSelector((state) => state.subcategory.loading);
+  const fetchError = useSelector((state) => state.subcategory.fetchError);
 
-  const handleAddUser = async (newUser) => {
-    try {
-      await dispatch(createUser(newUser)).unwrap();
+  const handleAddCategory = async (newCategory) => {
+    const result = await dispatch(createsubCategory(newCategory));
+    if (createsubCategory.rejected.match(result)) {
+      const message =
+        result.payload?.message || result.error?.message || "Ocurrió un error";
+      toast.error(`Error al crear subcategoría: ${message}`, {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      await dispatch(fetchsubCategories({ page, limit }));
+      toast.success(`Subcategoria creada con exito!}`, {
+        position: "top-center",
+        duration: 3000,
+      });
       setIsModalOpen(false);
-      await dispatch(fetchUsers({ page, limit }));
-      return true;
-    } catch (err) {
-      console.error("❌ Error creating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
-      return false;
-    }
-  };
-
-  const handleUpdateUser = async (updatedUser) => {
-    try {
-      await dispatch(updateUser({ id: currentUser._id, ...updatedUser }));
-      setIsModalOpen(false);
-      setCurrentUser(null);
+      setCurrentSubCategory(null);
       setIsUpdate(false);
-      await dispatch(fetchUsers({ page, limit }));
-    } catch (err) {
-      console.error("❌ Error creating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
-      return false;
     }
   };
 
-  const filteredData = users.filter((user) =>
-    user?.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const handleUpdateCategory = async (updatedsubCategory) => {
+    const result = await dispatch(
+      updatesubCategory({ id: currentSubCategory._id, ...updatedsubCategory }),
+    );
+    if (updatesubCategory.rejected.match(result)) {
+      const message =
+        result.payload?.message || result.error?.message || "Ocurrió un error";
+      toast.error(`Error al actualizar subcategoría: ${message}`, {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      await dispatch(fetchsubCategories({ page, limit }));
+      setIsModalOpen(false);
+      setCurrentSubCategory(null);
+      setIsUpdate(false);
+    }
+  };
+
+  const filteredData = Array.isArray(subcategories)
+    ? subcategories.filter((product) =>
+        product?.name?.toLowerCase().includes(search.toLowerCase()),
+      )
+    : [];
 
   const removeItemById = async (id) => {
-    await dispatch(deleteUser(id));
-    await dispatch(fetchUsers({ page, limit }));
+    const result = await dispatch(deletesubCategory(id));
+
+    if (deletesubCategory.rejected.match(result)) {
+      const message =
+        result.payload?.message || result.error?.message || "Ocurrió un error";
+      toast.error(`Error al eliminar subcategoría: ${message}`, {
+        position: "top-center",
+        duration: 3000,
+      });
+    } else {
+      toast.success("Subcategoría eliminada correctamente", {
+        position: "top-center",
+        duration: 2000,
+      });
+      await dispatch(fetchsubCategories({ page, limit }));
+    }
   };
 
   useEffect(() => {
-    dispatch(fetchUsers({ page, limit }));
+    dispatch(fetchsubCategories({ page, limit }));
   }, [dispatch, page]);
 
   if (loading) {
-    return <Loader2 />;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-white" />
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div>
+        <p>Opps!</p>
+        <p className="mb-4 text-gray-500">Error al cargar las subcategorías</p>
+        <Button onClick={() => dispatch(fetchsubCategories({ page, limit }))}>
+          Reintentar
+        </Button>
+      </div>
+    );
   }
 
   return (
     <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
-        title="Usuarios List"
+        title="Lista de sub Categorias"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
-        addTitle={"Agregar Usuario"}
-        onRefresh={() => dispatch(fetchUsers({ page, limit }))}
+        addTitle={"Agregar Sub Categoria"}
+        onRefresh={() => dispatch(fetchsubCategories({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -112,7 +159,8 @@ export default function Users() {
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
-              <TableHead>Rol</TableHead>
+              <TableHead>Categorías</TableHead>
+              <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -121,9 +169,10 @@ export default function Users() {
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>
-                  <Badge className="m-1">{row.role?.name}</Badge>
+                  <Badge>{row.category?.name}</Badge>
                 </TableCell>
 
+                <TableCell>{row.description}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -141,7 +190,7 @@ export default function Users() {
                         onClick={() => {
                           setIsUpdate(true);
                           setIsModalOpen(true);
-                          setCurrentUser(row);
+                          setCurrentSubCategory(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -191,16 +240,16 @@ export default function Users() {
       </div>
 
       {isModalOpen && (
-        <UserModal
+        <SubcategoryModal
           open={isModalOpen}
           isUpdate={isUpdate}
-          user={currentUser}
+          subcategory={currentSubCategory}
           onCancel={() => {
             setIsModalOpen(false);
-            setCurrentUser(null);
+            setCurrentSubCategory(null);
             setIsUpdate(false);
           }}
-          onSubmit={isUpdate ? handleUpdateUser : handleAddUser}
+          onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
         />
       )}
     </div>

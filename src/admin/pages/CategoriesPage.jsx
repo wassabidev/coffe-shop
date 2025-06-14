@@ -17,106 +17,87 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import toast, { Toaster } from "react-hot-toast";
+import { Loader2 } from "lucide-react";
+
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import SubcategoryModal from "../components/forms/SubcategoryForm";
+import CategoryModal from "../components/forms/CategoryForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
+import toast, { Toaster } from "react-hot-toast";
 import {
-  createsubCategory,
-  deletesubCategory,
-  fetchsubCategories,
-  updatesubCategory,
-} from "../../hooks/subcategories";
+  createCategory,
+  deleteCategory,
+  fetchCategories,
+  updateCategory,
+} from "../../hooks/categories";
 
-export default function SubCategories() {
+export default function Categories() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentSubCategory, setCurrentSubCategory] = useState(null);
+  const [currentCategory, setCurrentCategory] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const dispatch = useDispatch();
-  const subcategories = useSelector((state) => state.subcategory.lista);
-  const totalPages = useSelector((state) => state.subcategory.pages);
-  const loading = useSelector((state) => state.subcategory.loading);
-  const fetchError = useSelector((state) => state.subcategory.fetchError);
+  const categories = useSelector((state) => state.category.lista);
+  const totalPages = useSelector((state) => state.category.pages);
+  const loading = useSelector((state) => state.category.loading);
+  const error = useSelector((state) => state.category.error);
 
   const handleAddCategory = async (newCategory) => {
-    const result = await dispatch(createsubCategory(newCategory));
-    if (createsubCategory.rejected.match(result)) {
-      const message =
-        result.payload?.message || result.error?.message || "Ocurrió un error";
-      toast.error(`Error al crear subcategoría: ${message}`, {
-        position: "top-center",
-        duration: 3000,
-      });
-    } else {
-      await dispatch(fetchsubCategories({ page, limit }));
-      toast.success(`Subcategoria creada con exito!}`, {
-        position: "top-center",
-        duration: 3000,
-      });
+    try {
+      await dispatch(createCategory(newCategory)).unwrap();
       setIsModalOpen(false);
-      setCurrentSubCategory(null);
-      setIsUpdate(false);
+      return true;
+    } catch (err) {
+      toast.error(`${err}`, {
+        position: "top-center",
+      });
+      return false;
     }
   };
 
-  const handleUpdateCategory = async (updatedsubCategory) => {
+  const handleUpdateCategory = async (updatedCategory) => {
     const result = await dispatch(
-      updatesubCategory({ id: currentSubCategory._id, ...updatedsubCategory }),
+      updateCategory({ id: currentCategory._id, ...updatedCategory }),
     );
-    if (updatesubCategory.rejected.match(result)) {
+    if (updateCategory.rejected.match(result)) {
       const message =
         result.payload?.message || result.error?.message || "Ocurrió un error";
-      toast.error(`Error al actualizar subcategoría: ${message}`, {
+      toast.error(`Error al actualizar categoria: ${message}`, {
         position: "top-center",
         duration: 3000,
       });
     } else {
-      await dispatch(fetchsubCategories({ page, limit }));
+      await dispatch(fetchCategories({ page, limit }));
+      toast.success(`Categoria actualizada con exito!`, {
+        position: "top-center",
+        duration: 3000,
+      });
       setIsModalOpen(false);
-      setCurrentSubCategory(null);
+      setCurrentCategory(null);
       setIsUpdate(false);
     }
   };
 
-  const filteredData = Array.isArray(subcategories)
-    ? subcategories.filter((product) =>
-        product?.name?.toLowerCase().includes(search.toLowerCase()),
-      )
-    : [];
+  const filteredData = categories.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const removeItemById = async (id) => {
-    const result = await dispatch(deletesubCategory(id));
-
-    if (deletesubCategory.rejected.match(result)) {
-      const message =
-        result.payload?.message || result.error?.message || "Ocurrió un error";
-      toast.error(`Error al eliminar subcategoría: ${message}`, {
-        position: "top-center",
-        duration: 3000,
-      });
-    } else {
-      toast.success("Subcategoría eliminada correctamente", {
-        position: "top-center",
-        duration: 2000,
-      });
-      await dispatch(fetchsubCategories({ page, limit }));
-    }
+    await dispatch(deleteCategory(id));
+    await dispatch(fetchCategories({ page, limit }));
   };
 
   useEffect(() => {
-    dispatch(fetchsubCategories({ page, limit }));
+    dispatch(fetchCategories({ page, limit }));
   }, [dispatch, page]);
 
   if (loading) {
@@ -128,15 +109,11 @@ export default function SubCategories() {
       </div>
     );
   }
-
-  if (fetchError) {
+  if (error) {
     return (
       <div>
-        <p>Opps!</p>
-        <p className="mb-4 text-gray-500">Error al cargar las subcategorías</p>
-        <Button onClick={() => dispatch(fetchsubCategories({ page, limit }))}>
-          Reintentar
-        </Button>
+        Opps! <br />
+        Ocurrio un error al cargar las categoria
       </div>
     );
   }
@@ -145,12 +122,12 @@ export default function SubCategories() {
     <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
-        title="Sub Categorias List"
+        title="Lista de Categorias"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
-        addTitle={"Agregar Sub Categoria"}
-        onRefresh={() => dispatch(fetchsubCategories({ page, limit }))}
+        addTitle={"Agregar Categoria"}
+        onRefresh={() => dispatch(fetchCategories({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -158,8 +135,8 @@ export default function SubCategories() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Nombre</TableHead>
               <TableHead>Categorías</TableHead>
+              <TableHead>Subategorías</TableHead>
               <TableHead>Descripción</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
@@ -169,7 +146,11 @@ export default function SubCategories() {
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
                 <TableCell>
-                  <Badge>{row.category?.name}</Badge>
+                  {row.subcategory.map((sub, i) => (
+                    <Badge key={i} className="m-1">
+                      {sub.name}
+                    </Badge>
+                  ))}
                 </TableCell>
 
                 <TableCell>{row.description}</TableCell>
@@ -190,7 +171,7 @@ export default function SubCategories() {
                         onClick={() => {
                           setIsUpdate(true);
                           setIsModalOpen(true);
-                          setCurrentSubCategory(row);
+                          setCurrentCategory(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -240,13 +221,13 @@ export default function SubCategories() {
       </div>
 
       {isModalOpen && (
-        <SubcategoryModal
+        <CategoryModal
           open={isModalOpen}
           isUpdate={isUpdate}
-          subcategory={currentSubCategory}
+          category={currentCategory}
           onCancel={() => {
             setIsModalOpen(false);
-            setCurrentSubCategory(null);
+            setCurrentCategory(null);
             setIsUpdate(false);
           }}
           onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}

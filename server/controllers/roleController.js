@@ -56,10 +56,10 @@ export const getRoles = async (req, res) => {
         page: parseInt(page),
         pages: Math.ceil(total / limit),
       },
-      message: "rols optenidas con exito",
+      message: "roles optenidas con exito",
     });
   } catch (error) {
-    res.status(500).json({ message: "Error al obtener las rols", error });
+    res.status(500).json({ message: "Error al obtener las roles", error });
   }
 };
 
