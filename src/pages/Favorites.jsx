@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { fetchFavorites } from "@/hooks/favorites";
 
 import ProductCard from "@/components/ProductCard";
+import { Loader2 } from "lucide-react";
 
 const Favorites = () => {
   const dispatch = useDispatch();
@@ -12,6 +13,8 @@ const Favorites = () => {
   const guestFavoritesIds = JSON.parse(
     localStorage.getItem("guestFavorites") || "[]",
   );
+  const { loading: loadingFavorites } = useSelector((state) => state.favorites);
+  const { loading: loadingProducts } = useSelector((state) => state.product);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -38,6 +41,16 @@ const Favorites = () => {
             Usa el corazon para guardar tus favoritos, y que aparezcan aqui.
           </p>
         </div>
+      </div>
+    );
+  }
+  if (
+    (isAuthenticated && loadingFavorites) ||
+    (!isAuthenticated && loadingProducts)
+  ) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 />
       </div>
     );
   }
