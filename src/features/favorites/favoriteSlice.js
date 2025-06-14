@@ -73,9 +73,13 @@ export const favoriteSlice = createSlice({
 
         state.lista = (state.lista || []).filter(Boolean);
 
-        const favIndex = state.lista.findIndex(
-          (item) => item && item._id === product._id,
-        );
+        const favIndex = state.lista.findIndex((item) => {
+          const itemId =
+            typeof item.product === "string"
+              ? item.product
+              : item.product?._id || item._id;
+          return itemId === product.product;
+        });
 
         if (favIndex >= 0) {
           state.lista.splice(favIndex, 1);
