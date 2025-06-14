@@ -3,22 +3,23 @@ import Favorites from "../models/Favorites.js";
 export const toggleFavorite = async (req, res) => {
   const { product } = req.body;
   try {
-    const existing = await Favorites.findOne({
+    const activeFavorite = await Favorites.findOne({
       user: req.user.id,
-      product: product,
+      product,
       deletedAt: { $exists: false },
     }).populate("product");
 
-    if (existing) {
-      existing.deletedAt = new Date();
-      await existing.save();
+    if (activeFavorite) {
+      activeFavorite.deletedAt = new Date();
+      await activeFavorite.save();
       return res
         .status(200)
-        .json({ data: existing.product, message: "Producto eliminado" });
+        .json({ data: activeFavorite.product, message: "Producto eliminado" });
     }
+
     const previouslyDeleted = await Favorites.findOne({
       user: req.user.id,
-      product: product,
+      product,
       deletedAt: { $exists: true },
     });
 
@@ -50,6 +51,7 @@ export const toggleFavorite = async (req, res) => {
     });
   }
 };
+
 export const getFavorites = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
@@ -70,15 +72,64 @@ export const getFavorites = async (req, res) => {
 
     const items = favorites.map((favorite) => favorite.product);
     res.status(200).json({
-      data: items,
-      page: parseInt(page),
-      pages: Math.ceil(total / limit),
-      total,
+      data: {
+        favorite: items,
+        page: parseInt(page),
+        pages: Math.ceil(total / limit),
+        total,
+      },
+
       message: "Favoritos obtenidos con éxito",
     });
   } catch (err) {
     res
       .status(500)
       .json({ messge: "Error al obtener favoritos", error: err.message });
+  }
+};
+
+export const mergeFavorites = async (req, res) => {
+  const { productIds } = req.body;
+
+  if (!Array.isArray(productIds) || productIds.length === 0) {
+    return res.status(400).json({
+      message: "Se debe proporcionar un arreglo de productos",
+    });
+  }
+
+  try {
+    const results = [];
+
+    for (const productId of productIds) {
+      const existing = await Favorites.findOne({
+        user: req.user.id,
+        product: productId,
+      });
+
+      if (existing) {
+        if (existing.deletedAt) {
+          existing.deletedAt = undefined;
+          await existing.save();
+          await existing.populate("product");
+          results.push(existing.product);
+        }
+        // ya estaba activo, no hacemos nada
+      } else {
+        const newFav = new Favorites({ user: req.user.id, product: productId });
+        await newFav.save();
+        await newFav.populate("product");
+        results.push(newFav.product);
+      }
+    }
+
+    res.status(200).json({
+      message: "Favoritos sincronizados correctamente",
+      data: results,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error al sincronizar favoritos",
+      error: err.message,
+    });
   }
 };

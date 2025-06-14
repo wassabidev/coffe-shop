@@ -12,22 +12,37 @@ import DefaulImage from "/assets/product-placeholder.png";
 
 const ProductCard = ({ product }) => {
   const favorites = useSelector((state) => state.favorites.lista || []);
-  console.log("favorites", favorites);
   const { isAuthenticated } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const isFavorited = favorites.some((favorite) => {
-    if (!favorite) return false;
-    const favProduct = favorite.product || favorite;
-    return favProduct?._id === product._id;
-  });
+  const toggleGuestFavorite = (productId) => {
+    const stored = JSON.parse(localStorage.getItem("guestFavorites") || "[]");
+    const updated = stored.includes(productId)
+      ? stored.filter((id) => id !== productId)
+      : [...stored, productId];
+    localStorage.setItem("guestFavorites", JSON.stringify(updated));
+  };
+
+  const isProductGuestFavorite = (productId) => {
+    const stored = JSON.parse(localStorage.getItem("guestFavorites") || "[]");
+    return stored.includes(productId);
+  };
+
+  const isFavorited = isAuthenticated
+    ? favorites.some((favorite) => {
+        if (!favorite) return false;
+        const favProduct = favorite.product || favorite;
+        return favProduct?._id === product._id;
+      })
+    : isProductGuestFavorite(product._id);
 
   const handleFavorite = (event, product) => {
     event.stopPropagation();
     if (isAuthenticated) {
       dispatch(toggleFavorite(product._id));
     } else {
+      toggleGuestFavorite(product._id);
       if (isFavorited) {
         dispatch(removeFavorite(product));
       } else {

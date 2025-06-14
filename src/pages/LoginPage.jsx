@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../features/users/userSlice";
+import { fetchFavorites, toggleFavorite } from "../hooks/favorites";
+import { resetFavorites } from "@/features/favorites/favoriteSlice";
 import LoginFooter from "../components/LoginFooter";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
@@ -26,7 +28,7 @@ const LoginPage = () => {
     password: z
       .string()
       //cambiar minimo a 8
-      .min(1, "La contraseña debe tener al menos 8 caracteres")
+      .min(5, "La contraseña debe tener al menos 5 caracteres")
       .regex(/[a-zA-Z]/, "La contraseña debe contener al menos una letra")
       .regex(/[0-9]/, "La contraseña debe contener al menos un número"),
   });
@@ -44,6 +46,16 @@ const LoginPage = () => {
     return <Navigate to="/" />;
   }
 
+  const syncGuestFavorites = async (dispatch) => {
+    const stored = JSON.parse(localStorage.getItem("guestFavorites") || "[]");
+
+    for (const productId of stored) {
+      await dispatch(toggleFavorite(productId)).unwrap();
+    }
+
+    localStorage.removeItem("guestFavorites");
+  };
+
   const onSubmit = async (data) => {
     try {
       setLoading(true);
@@ -54,14 +66,17 @@ const LoginPage = () => {
       const token = response.data.token;
       const user = response.data.user;
       const refreshToken = response.data.refreshToken;
-      dispatch(setUser({ token, user, refreshToken }));
+
+      dispatch(resetFavorites());
+      await dispatch(setUser({ token, user, refreshToken }));
+      await syncGuestFavorites(dispatch);
+      await dispatch(fetchFavorites()).unwrap();
+
       setTimeout(() => {
         setLoading(false);
       }, "800");
       navigate("/");
     } catch (error) {
-      //esto  cambiar por un div en la parte superior
-      // del form
       setError(error.response?.data?.mensaje || "Error al iniciar sesión");
       setTimeout(() => {
         setLoading(false);
@@ -122,7 +137,7 @@ const LoginPage = () => {
 
             <div>
               <label htmlFor="password">Contraseña</label>
-              <div className="relative">
+              <div className="relative w-full md:w-11/12">
                 <input
                   type="password"
                   autoComplete="current-password"
@@ -132,7 +147,7 @@ const LoginPage = () => {
                     errors.password
                       ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
                       : "bg-gray-50 border-[0.1rem] border-gray-300 focus:border-blue-400"
-                  } !mt-2  text-gray-900 text-sm rounded-lg  block w-full md:w-11/12 p-2.5`}
+                  } !mt-2  text-gray-900 text-sm rounded-lg  block w-full p-2.5`}
                 />
                 <button
                   className="cursor-pointer bg-transparent absolute right-2 top-5 -translate-y-1/2"

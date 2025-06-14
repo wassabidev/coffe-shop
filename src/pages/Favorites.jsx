@@ -34,7 +34,7 @@ const Favorites = () => {
       <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
       <div className="container">
         {favoritesItems.map((favorite) => (
-          <ProductCard product={favorite} />
+          <ProductCard product={favorite} key={favorite._id} />
         ))}
       </div>
     </section>

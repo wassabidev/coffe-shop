@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { logout } from "../features/users/userSlice";
+import { resetFavorites } from "../features/favorites/favoriteSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Loader2, Text, X, LogOut, LogIn } from "lucide-react";
@@ -43,6 +44,7 @@ const Header = () => {
   const handleLogout = () => {
     setLoading(true);
     dispatch(logout());
+    dispatch(resetFavorites());
     setIsOpen(false);
     setTimeout(() => {
       setLoading(false);
