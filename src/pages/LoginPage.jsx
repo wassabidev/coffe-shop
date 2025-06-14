@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../features/users/userSlice";
 import { fetchFavorites, toggleFavorite } from "../hooks/favorites";
 import { resetFavorites } from "@/features/favorites/favoriteSlice";
+import { clearCart } from "../features/cart/cartSlice";
+
 import LoginFooter from "../components/LoginFooter";
 import { Navigate } from "react-router-dom";
 import axios from "axios";
@@ -68,6 +70,7 @@ const LoginPage = () => {
       const refreshToken = response.data.refreshToken;
 
       dispatch(resetFavorites());
+      dispatch(clearCart());
       await dispatch(setUser({ token, user, refreshToken }));
       await syncGuestFavorites(dispatch);
       await dispatch(fetchFavorites()).unwrap();

@@ -68,18 +68,19 @@ export const favoriteSlice = createSlice({
 
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         state.loading = false;
-        state.lista = state.lista.filter(Boolean);
         const product = action.payload.data;
+        if (!product || !product._id) return;
 
-        //console.log("TOGGLE FAVORITE:", action.payload.data._id);
-        //console.log("lista FAVORITE:", state.lista);
+        state.lista = (state.lista || []).filter(Boolean);
+
         const favIndex = state.lista.findIndex(
-          (item) => item._id === product._id,
+          (item) => item && item._id === product._id,
         );
+
         if (favIndex >= 0) {
           state.lista.splice(favIndex, 1);
         } else {
-          state.lista.push(action.payload.data);
+          state.lista.push(product);
         }
       })
 
