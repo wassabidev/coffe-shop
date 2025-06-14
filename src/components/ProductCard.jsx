@@ -77,10 +77,10 @@ const ProductCard = ({ product }) => {
           alt={product.name || "Default Image"}
         />
         <button
-          className={`absolute cursor-pointer top-2 right-2`}
+          className={`absolute cursor-pointer -top-4 -right-3 `}
           onClick={(event) => handleFavorite(event, product)}
         >
-          <HeartICon color={isFavorited} />
+          <span className={`heart ${isFavorited && "heart_animate"}`}></span>
         </button>
       </div>
       <div className="flex items-start flex-col">

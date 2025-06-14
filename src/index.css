@@ -58,7 +58,37 @@ li::marker{
   overflow: auto;
 }
 
+.heart {
+    background-image: url(./assets/web_heart_animation.webp);
+    background-position: left;
+    background-repeat: no-repeat;
+    background-size: calc(80px * 28);
+    cursor: pointer;
+    display: inline-block;
+    height: 80px;
+    width: 80px;
+}
 
+@-webkit-keyframes heartTransition
+{
+    0% {background-position: left;}
+    100% {background-position: right;}
+}
+
+@keyframes heartTransition
+{
+    0% {background-position: left;}
+    100% {background-position: right;}
+}
+
+.heart_animate
+{
+    animation-duration: .8s;
+    animation-iteration-count: 1;
+    animation-name: heartTransition;
+    animation-timing-function: steps(28);
+    background-position: right;
+}
 
   @theme inline {
     --radius-sm: calc(var(--radius) - 4px);

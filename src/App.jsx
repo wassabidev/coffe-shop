@@ -5,7 +5,9 @@ import {
   Navigate,
 } from "react-router-dom";
 import Layout from "./components/Layout";
-
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchFavorites } from "./hooks/favorites";
 import AdminLayout from "./pages/AdminLayout";
 import AdminProducts from "./admin/pages/ProductsPage";
 import AdminCategories from "./admin/pages/CategoriesPage";
@@ -29,7 +31,14 @@ import AboutUsPage from "./pages/AboutUsPage";
 import ContactUsPage from "./pages/ContactUsPage";
 
 function App() {
+  const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchFavorites());
+    }
+  }, [isAuthenticated, dispatch]);
   return (
     <Router>
       <Routes>

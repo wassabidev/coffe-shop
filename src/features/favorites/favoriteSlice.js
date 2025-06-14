@@ -49,6 +49,7 @@ export const favoriteSlice = createSlice({
         state.fetchError = null;
       })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
+        //console.log("Fetched favorites:", action.payload.data.favorite);
         state.loading = false;
         state.lista = action.payload.data.favorite;
         state.total = action.payload.data.total;
@@ -71,18 +72,9 @@ export const favoriteSlice = createSlice({
         const product = action.payload.data;
         if (!product || !product._id) return;
 
-        state.lista = (state.lista || []).filter(Boolean);
-
-        const favIndex = state.lista.findIndex((item) => {
-          const itemId =
-            typeof item.product === "string"
-              ? item.product
-              : item.product?._id || item._id;
-          return itemId === product.product;
-        });
-
-        if (favIndex >= 0) {
-          state.lista.splice(favIndex, 1);
+        const exists = state.lista.some((item) => item._id === product._id);
+        if (exists) {
+          state.lista = state.lista.filter((item) => item._id !== product._id);
         } else {
           state.lista.push(product);
         }
