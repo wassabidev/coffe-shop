@@ -101,12 +101,16 @@ const ProductDetails = ({ product }) => {
             <h3 className="relative font-medium text-lg text-start after:bg-green-100 after:rounded-full after:content-[''] after:w-full after:h-1.5 after:absolute after:-bottom-1 after:left-0 after:opacity-50">
               Opciones de tamaño
             </h3>
-            <div className="flex items-end justify-center gap-2">
+            <div className="relative flex items-end justify-center gap-2">
+              <div
+                className={`absolute transition-transform duration-300 ease-in-out bg-green-50 border-2 border-green-800 rounded-full h-14 w-14 z-0 left-[4.5rem] top-[0.9rem]`}
+                style={{
+                  transform: `translateX(${cupSizes.findIndex((c) => c.value === activeCup) * 4.5}rem)`,
+                  opacity: activeCup ? 1 : 0,
+                }}
+              ></div>
               {cupSizes.map((cupSize) => (
                 <div className="relative my-4" key={cupSize.value}>
-                  <div
-                    className={`bg-green-50 -z-10 transition-all ease-in-out border-2 border-green-800 rounded-full ${activeCup === cupSize.value ? "opacity-100" : "opacity-0"} h-14 w-14 absolute`}
-                  ></div>
                   <CupButton
                     setActiveCup={setActiveCup}
                     imagen={cupSize.value}
