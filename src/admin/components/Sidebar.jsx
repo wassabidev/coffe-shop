@@ -81,8 +81,8 @@ export default function Sidebar() {
   }, [userData]);
   if (loading) {
     return (
-      <div className="flex w-full flex-col items-center justify-center h-screen">
-        <Loader2 />
+      <div className="flex items-center w-full justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
       </div>
     );
   }

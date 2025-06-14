@@ -91,7 +91,11 @@ export default function Users() {
   }, [dispatch, page]);
 
   if (loading) {
-    return <Loader2 />;
+    return (
+      <div className="flex items-center w-full justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
+      </div>
+    );
   }
 
   return (

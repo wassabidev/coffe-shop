@@ -31,8 +31,8 @@ const Favorites = () => {
     (!isAuthenticated && loadingProducts)
   ) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 />
+      <div className="flex items-center w-full justify-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-900" />
       </div>
     );
   }
