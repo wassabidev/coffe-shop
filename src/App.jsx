@@ -7,10 +7,10 @@ import {
 import Layout from "./components/Layout";
 
 import AdminLayout from "./pages/AdminLayout";
-import AdminProducts from "./admin/pages/Products";
-import AdminCategories from "./admin/pages/Categories";
-import AdminSubcategoriesPage from "./admin/pages/Subcategories";
-import AdminUsers from "./admin/pages/Users";
+import AdminProducts from "./admin/pages/ProductsPage";
+import AdminCategories from "./admin/pages/CategoriesPage";
+import AdminSubcategoriesPage from "./admin/pages/SubcategoriesPage";
+import AdminUsers from "./admin/pages/UsersPage";
 import AdminRoles from "./admin/pages/RolesPage";
 
 import NoFound from "./pages/NotFound";
@@ -67,7 +67,7 @@ function App() {
             <Route path="categories" element={<AdminCategories />} />
             <Route path="subcategories" element={<AdminSubcategoriesPage />} />
             <Route path="users" element={<AdminUsers />} />
-            <Route path="rols" element={<AdminRoles />} />
+            <Route path="roles" element={<AdminRoles />} />
           </Route>
         </Route>
       </Routes>

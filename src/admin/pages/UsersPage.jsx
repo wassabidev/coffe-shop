@@ -20,7 +20,7 @@ import {
 import { Loader2 } from "lucide-react";
 
 import { Eye, Edit, MoreVertical, Trash2 } from "lucide-react";
-import CategoryModal from "../components/forms/CategoryForm";
+import UserModal from "../components/forms/UserForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,103 +31,79 @@ import { Badge } from "@/components/ui/badge";
 import { useSelector, useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import {
-  createCategory,
-  deleteCategory,
-  fetchCategories,
-  updateCategory,
-} from "../../hooks/categories";
+  createUser,
+  deleteUser,
+  fetchUsers,
+  updateUser,
+} from "../../hooks/users";
 
-export default function Categories() {
+export default function Users() {
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [currentCategory, setCurrentCategory] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [page, setPage] = useState(1);
   const limit = 5;
 
   const dispatch = useDispatch();
-  const categories = useSelector((state) => state.category.lista);
-  const totalPages = useSelector((state) => state.category.pages);
-  const loading = useSelector((state) => state.category.loading);
-  const error = useSelector((state) => state.category.error);
+  const users = useSelector((state) => state.user.lista);
+  const totalPages = useSelector((state) => state.user.pages);
+  const loading = useSelector((state) => state.user.loading);
 
-  const handleAddCategory = async (newCategory) => {
+  const handleAddUser = async (newUser) => {
     try {
-      await dispatch(createCategory(newCategory)).unwrap();
+      await dispatch(createUser(newUser)).unwrap();
       setIsModalOpen(false);
+      await dispatch(fetchUsers({ page, limit }));
       return true;
     } catch (err) {
-      toast.error(`${err}`, {
-        position: "top-center",
-      });
+      console.error("❌ Error creating user:", err);
+      toast.error(`${err}`, { position: "top-center" });
       return false;
     }
   };
 
-  const handleUpdateCategory = async (updatedCategory) => {
-    const result = await dispatch(
-      updateCategory({ id: currentCategory._id, ...updatedCategory }),
-    );
-    if (updateCategory.rejected.match(result)) {
-      const message =
-        result.payload?.message || result.error?.message || "Ocurrió un error";
-      toast.error(`Error al actualizar categoria: ${message}`, {
-        position: "top-center",
-        duration: 3000,
-      });
-    } else {
-      await dispatch(fetchCategories({ page, limit }));
-      toast.success(`Categoria actualizada con exito!`, {
-        position: "top-center",
-        duration: 3000,
-      });
+  const handleUpdateUser = async (updatedUser) => {
+    try {
+      await dispatch(updateUser({ id: currentUser._id, ...updatedUser }));
       setIsModalOpen(false);
-      setCurrentCategory(null);
+      setCurrentUser(null);
       setIsUpdate(false);
+      await dispatch(fetchUsers({ page, limit }));
+    } catch (err) {
+      console.error("❌ Error updating user:", err);
+      toast.error(`${err}`, { position: "top-center" });
+      return false;
     }
   };
 
-  const filteredData = categories.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()),
+  const filteredData = users.filter((user) =>
+    user?.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const removeItemById = async (id) => {
-    await dispatch(deleteCategory(id));
-    await dispatch(fetchCategories({ page, limit }));
+    await dispatch(deleteUser(id));
+    await dispatch(fetchUsers({ page, limit }));
   };
 
   useEffect(() => {
-    dispatch(fetchCategories({ page, limit }));
+    dispatch(fetchUsers({ page, limit }));
   }, [dispatch, page]);
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-white" />
-        </div>
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div>
-        Opps! <br />
-        Ocurrio un error al cargar las categoria
-      </div>
-    );
+    return <Loader2 />;
   }
 
   return (
     <div className="p-2 bg-gray-100 rounded-lg">
       <Toaster />
       <PageHeader
-        title="Categorias List"
+        title="Lista de Usuarios"
         onBack={() => window.history.back()}
         searchValue={search}
         setSearchValue={setSearch}
-        addTitle={"Agregar Categoria"}
-        onRefresh={() => dispatch(fetchCategories({ page, limit }))}
+        addTitle={"Agregar Usuario"}
+        onRefresh={() => dispatch(fetchUsers({ page, limit }))}
         onAdd={() => setIsModalOpen(true)}
       />
 
@@ -135,9 +111,9 @@ export default function Categories() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Categorías</TableHead>
-              <TableHead>Subategorías</TableHead>
-              <TableHead>Descripción</TableHead>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
@@ -145,15 +121,11 @@ export default function Categories() {
             {filteredData.map((row) => (
               <TableRow key={row._id}>
                 <TableCell>{row.name}</TableCell>
+                <TableCell>{row.email}</TableCell>
                 <TableCell>
-                  {row.subcategory.map((sub, i) => (
-                    <Badge key={i} className="m-1">
-                      {sub.name}
-                    </Badge>
-                  ))}
+                  <Badge className="m-1">{row.role?.name}</Badge>
                 </TableCell>
 
-                <TableCell>{row.description}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -171,7 +143,7 @@ export default function Categories() {
                         onClick={() => {
                           setIsUpdate(true);
                           setIsModalOpen(true);
-                          setCurrentCategory(row);
+                          setCurrentUser(row);
                         }}
                       >
                         <Edit className="mr-2 h-4 w-4" /> Editar
@@ -221,16 +193,16 @@ export default function Categories() {
       </div>
 
       {isModalOpen && (
-        <CategoryModal
+        <UserModal
           open={isModalOpen}
           isUpdate={isUpdate}
-          category={currentCategory}
+          user={currentUser}
           onCancel={() => {
             setIsModalOpen(false);
-            setCurrentCategory(null);
+            setCurrentUser(null);
             setIsUpdate(false);
           }}
-          onSubmit={isUpdate ? handleUpdateCategory : handleAddCategory}
+          onSubmit={isUpdate ? handleUpdateUser : handleAddUser}
         />
       )}
     </div>

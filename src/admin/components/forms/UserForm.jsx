@@ -57,6 +57,9 @@ export default function UserModalForm({
   });
 
   const handleOk = handleSubmit((data) => {
+    if (!data.password) {
+      delete data.password;
+    }
     onSubmit(data);
     reset();
   });
@@ -66,7 +69,7 @@ export default function UserModalForm({
       reset({
         name: user.name,
         email: user.email,
-        password: user.password,
+        password: "",
         role: user.role?._id,
         description: user.description,
       });
@@ -108,7 +111,7 @@ export default function UserModalForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {isUpdate ? "Editar Sub Categoría" : "Agregar nueva Sub Categoría"}
+            {isUpdate ? "Editar Usuario" : "Agregar nuevo usuario"}
           </DialogTitle>
         </DialogHeader>
 

@@ -29,7 +29,7 @@ const ProductsDetailsPage = () => {
   if (loading) return <Loading />;
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
+      <div className="flex w-full flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold text-red-500">
           Opps! Algo salio mal
         </h1>

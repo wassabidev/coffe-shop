@@ -45,6 +45,7 @@ const CartDetail = () => {
       return;
     }
     try {
+      setIsLoading(true);
       const res = await axiosInstance.post("/order", {
         items: cartItems,
         total,

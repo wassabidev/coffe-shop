@@ -21,7 +21,15 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const newToken = response.headers["x-access-token"];
+    if (newToken) {
+      const { refreshToken } = store.getState().user;
+      store.dispatch(setUser({ token: newToken, refreshToken }));
+      axiosInstance.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+    }
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const refreshToken = store.getState().user.refreshToken;
