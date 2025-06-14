@@ -26,6 +26,17 @@ const Favorites = () => {
     ? authFavorites
     : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
 
+  if (
+    (isAuthenticated && loadingFavorites) ||
+    (!isAuthenticated && loadingProducts)
+  ) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 />
+      </div>
+    );
+  }
+
   if (favoritesItems.length === 0 || !favoritesItems) {
     return (
       <div className="flex flex-col gap-5">
@@ -44,16 +55,7 @@ const Favorites = () => {
       </div>
     );
   }
-  if (
-    (isAuthenticated && loadingFavorites) ||
-    (!isAuthenticated && loadingProducts)
-  ) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 />
-      </div>
-    );
-  }
+
   return (
     <section>
       <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
