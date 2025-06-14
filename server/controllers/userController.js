@@ -6,13 +6,20 @@ export const createUser = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     //buscar en la bd si ya existe user con el mismo email
-
+    let roleId = role;
+    if (!role) {
+      const defaultRole = await Role.findOne({ name: "customer" });
+      if (!defaultRole) {
+        return res.status(400).json({ message: "Default role not found" });
+      }
+      roleId = defaultRole._id;
+    }
     const userExist = await User.exists({ email });
 
     if (userExist) {
       return res.status(403).json({ message: "Usuario con email ya exite" });
     }
-    const roleExist = await Role.findById(role);
+    const roleExist = await Role.findById(roleId);
     if (!roleExist) {
       return res.status(400).json({ message: "El rol especificado no existe" });
     }
@@ -21,7 +28,7 @@ export const createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role,
+      role: roleId,
       active: true,
     });
 

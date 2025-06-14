@@ -16,7 +16,7 @@ export const favoriteSlice = createSlice({
   initialState,
   reducers: {
     addFavorite(state, action) {
-      console.log("ADD FAVORITE:", action.payload, "algo: ", state.lista);
+      //console.log("ADD FAVORITE:", action.payload, "algo: ", state.lista);
 
       const listaActual = Array.isArray(state.lista) ? state.lista : [];
       const exists = listaActual.some(
@@ -71,8 +71,8 @@ export const favoriteSlice = createSlice({
         state.lista = state.lista.filter(Boolean);
         const product = action.payload.data;
 
-        console.log("TOGGLE FAVORITE:", action.payload.data._id);
-        console.log("lista FAVORITE:", state.lista);
+        //console.log("TOGGLE FAVORITE:", action.payload.data._id);
+        //console.log("lista FAVORITE:", state.lista);
         const favIndex = state.lista.findIndex(
           (item) => item._id === product._id,
         );

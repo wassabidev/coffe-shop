@@ -3,10 +3,17 @@ import { API_URL } from "@/api/api";
 
 export const fetchFavorites = createAsyncThunk(
   "favorites/fetch",
-  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 } = {}, { getState, rejectWithValue }) => {
+    const token = getState().user.token;
+
     try {
       const res = await fetch(
         `${API_URL}/favorites?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
       const json = await res.json();
       if (!res.ok) {
