@@ -59,7 +59,7 @@ li::marker{
 }
 
 .heart {
-    background-image: url(./assets/web_heart_animation.webp);
+    background-image: url(./web_heart_animation.webp);
     background-position: left;
     background-repeat: no-repeat;
     background-size: calc(80px * 28);
