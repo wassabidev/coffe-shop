@@ -4,12 +4,14 @@ import SideBar from "../components/SideBar";
 import Search from "../components/Search";
 import StatusView from "../components/StatusView";
 import { fetchProducts } from "../hooks/products";
+import { fetchFavorites } from "@/hooks/favorites";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { API_URL } from "@/api/api";
 
 const ListProducts = () => {
   const products = useSelector((state) => state.product.lista);
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
@@ -50,6 +52,13 @@ const ListProducts = () => {
 
     return nameMatch || subMatch;
   });
+
+  useEffect(() => {
+    dispatch(fetchProducts({ all: true }));
+    if (isAuthenticated) {
+      dispatch(fetchFavorites());
+    }
+  }, [dispatch, isAuthenticated]);
 
   return (
     <>

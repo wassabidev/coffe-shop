@@ -1,15 +1,27 @@
 import { useSelector, useDispatch } from "react-redux";
-import { fetchFavorites } from "../hooks/favorites";
+import { useEffect } from "react";
+import { fetchFavorites } from "@/hooks/favorites";
+
 import ProductCard from "@/components/ProductCard";
 
 const Favorites = () => {
-  const favoritesItems = useSelector((state) => state.favorites.lista);
-  const { isAuthenticated } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.user);
+  const allProducts = useSelector((state) => state.product.lista || []);
+  const authFavorites = useSelector((state) => state.favorites.lista || []);
+  const guestFavoritesIds = JSON.parse(
+    localStorage.getItem("guestFavorites") || "[]",
+  );
 
-  if (isAuthenticated) {
-    dispatch(fetchFavorites());
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchFavorites());
+    }
+  }, [dispatch, isAuthenticated]);
+
+  const favoritesItems = isAuthenticated
+    ? authFavorites
+    : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
 
   if (favoritesItems.length === 0 || !favoritesItems) {
     return (

@@ -59,7 +59,6 @@ const Header = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="flex flex-col items-center gap-3">
             <Loader2 className="h-8 w-8 animate-spin text-white" />
-            <p className="text-white">Procesando...</p>
           </div>
         </div>
       )}
@@ -117,7 +116,7 @@ const Header = () => {
                   className={({ isActive }) =>
                     `flex flex-col px-3 py-2 rounded ${
                       isActive
-                        ? " after:bg-green-200 after:h-1 after:rounded-lg content-[''] after:w-full text-green-800"
+                        ? " after:bg-green-900/60 after:h-1 after:rounded-lg content-[''] after:w-full text-green-800 transition-all duration-300 ease-in-out"
                         : "text-gray-700 hover:bg-gray-200"
                     }`
                   }
@@ -128,16 +127,16 @@ const Header = () => {
             </ul>
           </div>
 
-          <div className="hidden md:flex gap-3">
+          <div className="hidden md:flex gap-3 ">
             {navItems.map(({ label, path }) => (
               <NavLink
                 key={path}
                 to={path}
                 className={({ isActive }) =>
-                  `flex gap-2 px-3 py-2 rounded ${
+                  `flex items-center gap-2 flex-col px-3 py-2 rounded relative ${
                     isActive
-                      ? "bg-gray-500 text-gray-100"
-                      : "text-gray-700 hover:bg-gray-200"
+                      ? "after:absolute after:bottom-0 after:bg-green-900/60 after:h-1 after:rounded-lg content-[''] after:w-full transition-all duration-500 ease-in-out"
+                      : "text-gray-700 hover:bg-green-900/50 hover:text-white transition-all duration-300 ease-in-out"
                   }`
                 }
               >
