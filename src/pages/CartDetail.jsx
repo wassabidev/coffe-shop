@@ -41,7 +41,7 @@ const CartDetail = () => {
         toast.error("Debes iniciar sesión para confirmar la compra", {
           position: "top-center",
         });
-      }, 800);
+      }, 500);
       return;
     }
     try {
@@ -51,11 +51,9 @@ const CartDetail = () => {
         total,
       });
       setLastOrder(res.data);
-      setShowModal(true);
       dispatch(clearCart());
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
+      setIsLoading(false);
+      setShowModal(true);
     } catch (error) {
       setIsLoading(false);
       console.error(
