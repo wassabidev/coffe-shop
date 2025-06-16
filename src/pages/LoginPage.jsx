@@ -77,13 +77,13 @@ const LoginPage = () => {
 
       setTimeout(() => {
         setLoading(false);
-      }, "800");
+      }, 800);
       navigate("/");
     } catch (error) {
       setError(error.response?.data?.mensaje || "Error al iniciar sesión");
       setTimeout(() => {
         setLoading(false);
-      }, "800");
+      }, 800);
     }
   };
 

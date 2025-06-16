@@ -56,7 +56,7 @@ const SignUpPage = () => {
       toast.success("Usuario creado con éxito");
       setTimeout(() => {
         setLoading(false);
-      }, "800");
+      }, 800);
       setError("");
 
       navigate("/login");

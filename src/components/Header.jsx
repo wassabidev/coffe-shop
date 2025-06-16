@@ -50,7 +50,7 @@ const Header = () => {
     setIsOpen(false);
     setTimeout(() => {
       setLoading(false);
-    }, "800");
+    }, 800);
   };
 
   return (
