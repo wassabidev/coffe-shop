@@ -79,6 +79,15 @@ export default function Sidebar() {
       setLoading(false);
     }
   }, [userData]);
+  const navItemsFiltered = navItems.filter((item) => {
+    if (item.label === "Roles" && role.name !== "admin") {
+      return false;
+    }
+    if (item.label === "Usuarios" && role.name !== "admin") {
+      return false;
+    }
+    return true;
+  });
   if (loading) {
     return (
       <div className="flex items-center w-full justify-center h-screen">
@@ -89,7 +98,7 @@ export default function Sidebar() {
 
   const content = (
     <nav className="flex flex-col gap-2 p-4">
-      {navItems.map(({ label, path, icon }) => (
+      {navItemsFiltered.map(({ label, path, icon }) => (
         <NavLink
           key={path}
           to={path}
@@ -127,7 +136,7 @@ export default function Sidebar() {
           </SheetTrigger>
           <SheetContent side="left">
             <SheetHeader>
-              <SheetTitle>Menú</SheetTitle>
+              <SheetTitle>Admin Panel</SheetTitle>
             </SheetHeader>
             {content}
             <AvatarCard
