@@ -29,7 +29,6 @@ const LoginPage = () => {
     email: z.string().email("Correo no válido"),
     password: z
       .string()
-      //cambiar minimo a 8
       .min(5, "La contraseña debe tener al menos 5 caracteres")
       .regex(/[a-zA-Z]/, "La contraseña debe contener al menos una letra")
       .regex(/[0-9]/, "La contraseña debe contener al menos un número"),
@@ -42,6 +41,7 @@ const LoginPage = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
   });
 
   if (isAuthenticated) {
@@ -142,10 +142,10 @@ const LoginPage = () => {
               <label htmlFor="password">Contraseña</label>
               <div className="relative w-full md:w-11/12">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   {...register("password")}
-                  onChange={() => clearErrors("email")}
+                  onInput={() => clearErrors("password")}
                   className={`${
                     errors.password
                       ? "bg-red-50 border focus:outline-red-500 border-red-500 text-red-900 placeholder-red-700 text-sm rounded-lg focus:ring-red-500"
@@ -153,6 +153,7 @@ const LoginPage = () => {
                   } !mt-2  text-gray-900 text-sm rounded-lg  block w-full p-2.5`}
                 />
                 <button
+                  type="button"
                   className="cursor-pointer bg-transparent absolute right-2 top-5 -translate-y-1/2"
                   onClick={() => setShowPassword(!showPassword)}
                 >
