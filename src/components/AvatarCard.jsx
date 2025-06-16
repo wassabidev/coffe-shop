@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 
 const AvatarCard = ({ user, role, onLogout }) => {
   return (
-    <div className="bg-slate-50 p-2 rounded-md flex mt-auto bottom-0 w-full items-center justify-between shadow-md">
+    <div className="bg-slate-50 flex mt-auto bottom-0 w-full items-center justify-between shadow-md px-4 py-2 hover:bg-slate-300">
       <div>
         <p className="font-semibold">{user.name}</p>
         <p>{role.name}</p>

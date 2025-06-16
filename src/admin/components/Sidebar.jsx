@@ -124,6 +124,14 @@ export default function Sidebar() {
       <aside className="hidden sm:block w-64 bg-white shadow min-h-screen">
         <div className="p-4 text-lg font-bold border-b">Admin Panel</div>
         {content}
+        <AvatarCard
+          user={userData}
+          role={role}
+          onLogout={() => {
+            dispatch(logout());
+            setIsOpen(false);
+          }}
+        />
       </aside>
 
       {/* Mobile: Toggle Button */}
