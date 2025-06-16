@@ -3,6 +3,12 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@font-face {
+  font-family: 'ponpis';
+  src: url('/fonts/mi-fuente.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .ellipsis{
   white-space: nowrap;
@@ -56,6 +62,7 @@ li::marker{
   html, body {
   height: 100%;
   overflow: auto;
+  font-family: ponpis, sans-serif;
 }
 
 .heart {
