@@ -53,6 +53,7 @@ export const updateCategory = createAsyncThunk(
 
       return json;
     } catch (err) {
+      console.error(err);
       return rejectWithValue({ message: "Error al actulizar la categoria" });
     }
   },
@@ -70,6 +71,7 @@ export const deleteCategory = createAsyncThunk(
       }
       return json;
     } catch (err) {
+      console.log(err);
       return rejectWithValue({
         message: "Error de red al eliminar la categoria",
       });

@@ -85,7 +85,7 @@ export default function Products() {
     dispatch(deleteProduct(id));
   };
   const filteredData = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()),
+    product?.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   useEffect(() => {

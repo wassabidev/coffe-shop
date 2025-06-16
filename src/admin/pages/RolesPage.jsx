@@ -55,7 +55,7 @@ export default function RolesPage() {
       setIsModalOpen(false);
       return true;
     } catch (err) {
-      toast.error(`${err}`, {
+      toast.error(err.message, {
         position: "top-center",
       });
       return false;
@@ -63,15 +63,23 @@ export default function RolesPage() {
   };
 
   const handleUpdateRole = async (updatedRole) => {
-    await dispatch(updateRole({ id: currentRole._id, ...updatedRole }));
-    setIsModalOpen(false);
-    setCurrentRole(null);
-    setIsUpdate(false);
-    await dispatch(fetchRoles({ page, limit }));
+    try {
+      await dispatch(
+        updateRole({ id: currentRole._id, ...updatedRole }),
+      ).unwrap();
+      setIsModalOpen(false);
+      setCurrentRole(null);
+      setIsUpdate(false);
+      await dispatch(fetchRoles({ page, limit }));
+    } catch (err) {
+      toast.error(err.message || "Opp! ocurrio un error", {
+        position: "top-center",
+      });
+    }
   };
 
-  const filteredData = roles.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()),
+  const filteredData = roles.filter((role) =>
+    role?.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   const removeItemById = async (id) => {

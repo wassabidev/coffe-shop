@@ -29,15 +29,29 @@ export default function UserModalForm({
   user,
 }) {
   const [roles, setRoles] = useState([]);
-  const formSchema = z.object({
+  const baseSchema = {
     name: z.string().trim().nonempty({ message: "Campo obligatorio" }),
     email: z.string().email({ message: "Email inválido" }),
-    password: z
-      .string()
-      .min(6, { message: "Mínimo 6 caracteres" })
-      .max(32, { message: "Máximo 32 caracteres" }),
     role: z.string().nonempty({ message: "Campo obligatorio" }),
-  });
+  };
+  const formSchema = isUpdate
+    ? z.object({
+        ...baseSchema,
+        password: z
+          .string()
+          .optional()
+          .or(z.literal(""))
+          .refine((val) => !val || val.length >= 6, {
+            message: "Mínimo 6 caracteres si se completa",
+          }),
+      })
+    : z.object({
+        ...baseSchema,
+        password: z
+          .string()
+          .min(6, { message: "Mínimo 6 caracteres" })
+          .max(32, { message: "Máximo 32 caracteres" }),
+      });
 
   const {
     formState: { errors },

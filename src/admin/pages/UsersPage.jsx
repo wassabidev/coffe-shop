@@ -57,8 +57,8 @@ export default function Users() {
       await dispatch(fetchUsers({ page, limit }));
       return true;
     } catch (err) {
-      console.error("❌ Error creating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
+      console.error("Error creando user:", err);
+      toast.error(err.message, { position: "top-center" });
       return false;
     }
   };
@@ -71,8 +71,8 @@ export default function Users() {
       setIsUpdate(false);
       await dispatch(fetchUsers({ page, limit }));
     } catch (err) {
-      console.error("❌ Error updating user:", err);
-      toast.error(`${err}`, { position: "top-center" });
+      console.error("Error updating user:", err);
+      toast.error(err.message, { position: "top-center" });
       return false;
     }
   };
