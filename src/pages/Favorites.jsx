@@ -22,11 +22,9 @@ const Favorites = () => {
     }
   }, [dispatch, isAuthenticated]);
 
-  const getFavoritesItems = () => {
-    return isAuthenticated
-      ? authFavorites
-      : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
-  };
+  const favoritesItems = isAuthenticated
+    ? authFavorites
+    : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
 
   if (
     (isAuthenticated && loadingFavorites) ||
@@ -39,7 +37,7 @@ const Favorites = () => {
     );
   }
 
-  if (getFavoritesItems().length === 0) {
+  if (favoritesItems.length === 0) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="text-3xl font-bold text-left my-4">
@@ -51,7 +49,7 @@ const Favorites = () => {
             Guarda tus favoritos
           </h2>
           <p className="text-gray-500 font-medium text-left">
-            Usa el corazon para guardar tus favoritos, y que aparezcan aqui.
+            Usa el corazón para guardar tus favoritos y que aparezcan aquí.
           </p>
         </div>
       </div>
@@ -62,7 +60,7 @@ const Favorites = () => {
     <section>
       <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
       <div className="container">
-        {getFavoritesItems().map((favorite) => (
+        {favoritesItems.map((favorite) => (
           <ProductCard product={favorite} key={favorite._id} />
         ))}
       </div>
