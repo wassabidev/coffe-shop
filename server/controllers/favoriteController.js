@@ -12,9 +12,11 @@ export const toggleFavorite = async (req, res) => {
     if (activeFavorite) {
       activeFavorite.deletedAt = new Date();
       await activeFavorite.save();
-      return res
-        .status(200)
-        .json({ data: activeFavorite.product, message: "Producto eliminado" });
+      return res.status(200).json({
+        action: "removed",
+        data: activeFavorite.product,
+        message: "Producto eliminado",
+      });
     }
 
     const previouslyDeleted = await Favorites.findOne({
@@ -28,8 +30,9 @@ export const toggleFavorite = async (req, res) => {
       await previouslyDeleted.save();
       await previouslyDeleted.populate("product");
       return res.status(201).json({
-        message: "Producto restaurado a favoritos",
+        action: "added",
         data: previouslyDeleted.product,
+        message: "Producto restaurado a favoritos",
       });
     }
 
@@ -41,8 +44,9 @@ export const toggleFavorite = async (req, res) => {
     await newFavorite.save();
     await newFavorite.populate("product");
     res.status(201).json({
+      action: "added",
+      data: newFavorite.product,
       message: "Producto agregado a favoritos",
-      data: newFavorite,
     });
   } catch (err) {
     res.status(500).json({
@@ -51,7 +55,6 @@ export const toggleFavorite = async (req, res) => {
     });
   }
 };
-
 export const getFavorites = async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
