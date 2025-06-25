@@ -34,7 +34,7 @@ const ProductCard = ({ product }) => {
         const favoriteId =
           typeof favorite.product === "string"
             ? favorite.product
-            : favorite.product?._id || favorite._id;
+            : favorite.product?._id;
 
         return favoriteId === product._id;
       })

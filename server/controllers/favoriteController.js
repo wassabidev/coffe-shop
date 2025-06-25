@@ -42,7 +42,7 @@ export const toggleFavorite = async (req, res) => {
     await newFavorite.populate("product");
     res.status(201).json({
       message: "Producto agregado a favoritos",
-      data: newFavorite.product,
+      data: newFavorite,
     });
   } catch (err) {
     res.status(500).json({
