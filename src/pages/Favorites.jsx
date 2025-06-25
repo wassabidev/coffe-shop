@@ -62,7 +62,7 @@ const Favorites = () => {
     <section>
       <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
       <div className="container">
-        {getFavoritesItems.map((favorite) => (
+        {getFavoritesItems().map((favorite) => (
           <ProductCard product={favorite} key={favorite._id} />
         ))}
       </div>
