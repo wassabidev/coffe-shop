@@ -75,7 +75,7 @@ export const favoriteSlice = createSlice({
         } else {
           const exists = currentList.some((item) => item._id === data._id);
           if (!exists) {
-            state.lista.push(data);
+            state.lista = [...currentList, data];
           }
         }
       })
