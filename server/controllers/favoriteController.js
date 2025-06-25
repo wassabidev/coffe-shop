@@ -84,7 +84,7 @@ export const getFavorites = async (req, res) => {
   } catch (err) {
     res
       .status(500)
-      .json({ messge: "Error al obtener favoritos", error: err.message });
+      .json({ message: "Error al obtener favoritos", error: err.message });
   }
 };
 
