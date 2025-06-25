@@ -72,7 +72,10 @@ export const favoriteSlice = createSlice({
         if (backendAction === "removed") {
           state.lista = state.lista.filter((item) => item._id !== data._id);
         } else {
-          state.lista.push(data);
+          const exists = state.lista.some((item) => item._id === data._id);
+          if (!exists) {
+            state.lista.push(data);
+          }
         }
       })
 
