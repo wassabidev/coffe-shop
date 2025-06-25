@@ -15,6 +15,7 @@ const ProductCard = ({ product }) => {
   const { isAuthenticated } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  //console.log("ProductCard", favorites);
 
   const toggleGuestFavorite = (productId) => {
     const stored = JSON.parse(localStorage.getItem("guestFavorites") || "[]");
@@ -30,14 +31,7 @@ const ProductCard = ({ product }) => {
   };
 
   const isFavorited = isAuthenticated
-    ? favorites.some((favorite) => {
-        const favoriteId =
-          typeof favorite.product === "string"
-            ? favorite.product
-            : favorite.product?._id;
-
-        return favoriteId === product._id;
-      })
+    ? favorites.some((favorite) => favorite._id === product._id)
     : isProductGuestFavorite(product._id);
 
   const handleFavorite = (event, product) => {
