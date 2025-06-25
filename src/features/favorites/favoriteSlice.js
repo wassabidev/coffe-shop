@@ -68,11 +68,12 @@ export const favoriteSlice = createSlice({
       .addCase(toggleFavorite.fulfilled, (state, action) => {
         const { data, action: backendAction } = action.payload;
         if (!data || !data._id) return;
+        const currentList = Array.isArray(state.lista) ? state.lista : [];
 
         if (backendAction === "removed") {
-          state.lista = state.lista.filter((item) => item._id !== data._id);
+          state.lista = currentList.filter((item) => item._id !== data._id);
         } else {
-          const exists = state.lista.some((item) => item._id === data._id);
+          const exists = currentList.some((item) => item._id === data._id);
           if (!exists) {
             state.lista.push(data);
           }
