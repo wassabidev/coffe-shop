@@ -11,28 +11,24 @@ const initialState = {
   pages: 1,
 };
 
-export const favoriteSlice = createSlice({
+const favoriteSlice = createSlice({
   name: "favorites",
   initialState,
   reducers: {
     addFavorite(state, action) {
-      const listaActual = Array.isArray(state.lista) ? state.lista : [];
-      const exists = listaActual.some(
+      const exists = state.lista.some(
         (item) => item._id === action.payload._id,
       );
       if (!exists) {
-        state.lista = [...listaActual, action.payload];
+        state.lista.push(action.payload);
       }
     },
     removeFavorite(state, action) {
-      if (!Array.isArray(state.lista)) {
-        state.lista = [];
-      }
       state.lista = state.lista.filter(
         (item) => item._id !== action.payload._id,
       );
     },
-    resetFavorites: (state) => {
+    resetFavorites(state) {
       state.lista = [];
       state.total = 0;
       state.page = 1;
@@ -41,13 +37,11 @@ export const favoriteSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      //fetch
       .addCase(fetchFavorites.pending, (state) => {
         state.loading = true;
         state.fetchError = null;
       })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
-        //console.log("Fetched favorites:", action.payload.data.favorite);
         state.loading = false;
         state.lista = action.payload.data.favorite;
         state.total = action.payload.data.total;
@@ -59,33 +53,32 @@ export const favoriteSlice = createSlice({
         state.fetchError = action.payload?.message || action.error.message;
       })
 
-      //create
       .addCase(toggleFavorite.pending, (state) => {
         state.loading = true;
         state.createError = null;
       })
-
       .addCase(toggleFavorite.fulfilled, (state, action) => {
+        state.loading = false;
         const { data, action: backendAction } = action.payload;
         if (!data || !data._id) return;
-        const currentList = Array.isArray(state.lista) ? state.lista : [];
+
+        const exists = state.lista.some((item) => item._id === data._id);
 
         if (backendAction === "removed") {
-          state.lista = currentList.filter((item) => item._id !== data._id);
+          state.lista = state.lista.filter((item) => item._id !== data._id);
         } else {
-          const exists = currentList.some((item) => item._id === data._id);
           if (!exists) {
-            state.lista = [...currentList, data];
+            state.lista.push(data);
           }
         }
       })
-
       .addCase(toggleFavorite.rejected, (state, action) => {
         state.loading = false;
         state.createError = action.payload?.message || action.error.message;
       });
   },
 });
+
 export const { addFavorite, removeFavorite, resetFavorites } =
   favoriteSlice.actions;
 export default favoriteSlice.reducer;
