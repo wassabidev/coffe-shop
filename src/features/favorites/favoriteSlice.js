@@ -70,11 +70,14 @@ export const favoriteSlice = createSlice({
         const favorite = action.payload?.data;
         if (!favorite || !favorite._id) return;
 
-        const exists = state.lista.some((item) => item._id === favorite._id);
+        // Chequeo seguro
+        const lista = Array.isArray(state.lista) ? state.lista : [];
+
+        const exists = lista.some((item) => item._id === favorite._id);
         if (exists) {
-          state.lista = state.lista.filter((item) => item._id !== favorite._id);
+          state.lista = lista.filter((item) => item._id !== favorite._id);
         } else {
-          state.lista.push(favorite);
+          state.lista = [...lista, favorite];
         }
       })
 
