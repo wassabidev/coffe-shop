@@ -10,6 +10,7 @@ import axios from "axios";
 import { API_URL } from "@/api/api";
 
 const ListProducts = () => {
+  console.log("API URL:", import.meta.env.VITE_API_URL);
   const products = useSelector((state) => state.product.lista);
   const { isAuthenticated } = useSelector((state) => state.user);
 
