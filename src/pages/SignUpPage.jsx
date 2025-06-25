@@ -150,6 +150,7 @@ const SignUpPage = () => {
                   } !mt-2 text-gray-900 text-sm rounded-lg  block w-full p-2.5`}
                 />
                 <button
+                  type="button"
                   className="cursor-pointer bg-transparent absolute right-2 top-5 -translate-y-1/2"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -177,6 +178,7 @@ const SignUpPage = () => {
                   } !mt-2  text-gray-900 text-sm rounded-lg  block w-full p-2.5`}
                 />
                 <button
+                  type="button"
                   className="cursor-pointer bg-transparent absolute right-2 top-5 -translate-y-1/2"
                   onClick={() => setShowPassword(!showPassword)}
                 >
