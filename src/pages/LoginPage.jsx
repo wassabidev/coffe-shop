@@ -167,7 +167,7 @@ const LoginPage = () => {
               </div>
             </div>
             <div className="py-4 flex justify-end">
-              <Link className="text-blue-400 underline">
+              <Link className="text-blue-400 underline" to="/forgot-password">
                 Olvide mi contraseña
               </Link>
             </div>

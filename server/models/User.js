@@ -26,6 +26,12 @@ const UserSchema = new mongoose.Schema(
     deactivatedAt: {
       type: Date,
     },
+    resetToken: {
+      type: String,
+    },
+    resetTokenExpires: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

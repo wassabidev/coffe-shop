@@ -14,9 +14,9 @@ import AdminCategories from "./admin/pages/CategoriesPage";
 import AdminSubcategoriesPage from "./admin/pages/SubcategoriesPage";
 import AdminUsers from "./admin/pages/UsersPage";
 import AdminRoles from "./admin/pages/RolesPage";
-
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import NoFound from "./pages/NotFound";
-
 import LoginPage from "./pages/LoginPage";
 import Cart from "./pages/CartDetail";
 import ListProducts from "./pages/ListProducts";
@@ -45,6 +45,8 @@ function App() {
         <Route path="*" element={<NoFound />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Cliente */}
         <Route element={<Layout />}>
