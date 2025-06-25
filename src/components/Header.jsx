@@ -86,14 +86,12 @@ const Header = () => {
             <Text />
           </div>
 
-          <div>
-            <button
-              onClick={() => navigate("/")}
-              className="w-10 h-10 md:hidden cursor-pointer flex items-center justify-center )"
-            >
-              <img src="/assets/logocat.svg" alt="" />
-            </button>
-          </div>
+          <button
+            onClick={() => navigate("/")}
+            className="w-10 h-10 md:hidden cursor-pointer flex items-center justify-center )"
+          >
+            <img src="/assets/logocat.svg" alt="" />
+          </button>
 
           <div
             className={`${
