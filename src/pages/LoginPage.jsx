@@ -124,7 +124,9 @@ const LoginPage = () => {
             <div>
               <label htmlFor="email">Correo</label>
               <input
+                id="email"
                 type="text"
+                placeholder="example@gmail.com"
                 {...register("email")}
                 onChange={() => clearErrors("email")}
                 className={`${
@@ -142,6 +144,8 @@ const LoginPage = () => {
               <label htmlFor="password">Contraseña</label>
               <div className="relative w-full md:w-11/12">
                 <input
+                  id="password"
+                  placeholder="********"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   {...register("password")}

@@ -103,6 +103,7 @@ const SignUpPage = () => {
             <div>
               <label htmlFor="name">Nombre</label>
               <input
+                id="name"
                 type="text"
                 {...register("name")}
                 onChange={() => clearErrors("name")}
@@ -119,6 +120,7 @@ const SignUpPage = () => {
             <div>
               <label htmlFor="email">Correo</label>
               <input
+                id="email"
                 type="text"
                 {...register("email")}
                 onChange={() => clearErrors("email")}
@@ -137,6 +139,7 @@ const SignUpPage = () => {
               <label htmlFor="password">Contraseña</label>
               <div className="relative w-full">
                 <input
+                  id="password"
                   type={showPassword ? "text" : "password"}
                   {...register("password")}
                   onChange={() => clearErrors("password")}
@@ -160,9 +163,10 @@ const SignUpPage = () => {
               </div>
             </div>
             <div>
-              <label htmlFor="password">Confirmar contraseña</label>
+              <label htmlFor="confirmPassword">Confirmar contraseña</label>
               <div className="relative items-center justify-center">
                 <input
+                  id="confirmPassword"
                   type={showPassword ? "text" : "password"}
                   {...register("confirmPassword")}
                   onChange={() => clearErrors("confirmPassword")}
