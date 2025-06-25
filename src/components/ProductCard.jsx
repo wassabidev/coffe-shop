@@ -31,7 +31,14 @@ const ProductCard = ({ product }) => {
   };
 
   const isFavorited = isAuthenticated
-    ? favorites.some((favorite) => favorite._id === product._id)
+    ? favorites.some((favorite) => {
+        const favoriteId =
+          typeof favorite.product === "string"
+            ? favorite.product
+            : favorite.product?._id || favorite._id;
+
+        return favoriteId === product._id;
+      })
     : isProductGuestFavorite(product._id);
 
   const handleFavorite = (event, product) => {
