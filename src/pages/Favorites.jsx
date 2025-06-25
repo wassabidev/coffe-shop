@@ -22,9 +22,11 @@ const Favorites = () => {
     }
   }, [dispatch, isAuthenticated]);
 
-  const favoritesItems = isAuthenticated
-    ? authFavorites
-    : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
+  const getFavoritesItems = () => {
+    return isAuthenticated
+      ? authFavorites
+      : allProducts.filter((p) => guestFavoritesIds.includes(p._id));
+  };
 
   if (
     (isAuthenticated && loadingFavorites) ||
@@ -37,7 +39,7 @@ const Favorites = () => {
     );
   }
 
-  if (favoritesItems.length === 0 || !favoritesItems) {
+  if (getFavoritesItems().length === 0) {
     return (
       <div className="flex flex-col gap-5">
         <h2 className="text-3xl font-bold text-left my-4">
@@ -60,7 +62,7 @@ const Favorites = () => {
     <section>
       <h2 className="text-3xl font-bold text-left my-4">Mis favoritos</h2>
       <div className="container">
-        {favoritesItems.map((favorite) => (
+        {getFavoritesItems.map((favorite) => (
           <ProductCard product={favorite} key={favorite._id} />
         ))}
       </div>
